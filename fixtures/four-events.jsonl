@@ -1,0 +1,4 @@
+{"event_id":"a1","clock_id":"A","trace_id":"t1","message_id":"request-1","attempt":0,"kind":"send","ts_us":"1000000"}
+{"event_id":"b1","clock_id":"B","trace_id":"t1","message_id":"request-1","attempt":0,"kind":"receive","ts_us":"900000"}
+{"event_id":"b2","clock_id":"B","trace_id":"t1","message_id":"response-1","attempt":0,"kind":"send","ts_us":"940000"}
+{"event_id":"a2","clock_id":"A","trace_id":"t1","message_id":"response-1","attempt":0,"kind":"receive","ts_us":"1100000"}

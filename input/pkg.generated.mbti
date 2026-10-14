@@ -1,11 +1,89 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Mitsuha11zz/chronolens/input"
 
+import {
+  "Mitsuha11zz/chronolens/model",
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn parse_jsonl(String, source_path? : String, limits? : InputLimits) -> InputReport raise InputConfigError
 
 // Errors
+pub(all) suberror InputConfigError {
+  InvalidLimit(String)
+  InvalidSourcePath
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn InputConfigError::equal(Self, Self) -> Bool
+#deprecated
+pub fn InputConfigError::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn InputConfigError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub struct InputIssue {
+  line : Int?
+  kind : IssueKind
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn InputIssue::equal(Self, Self) -> Bool
+#deprecated
+pub fn InputIssue::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn InputIssue::to_repr(Self) -> @debug.Repr
+
+pub struct InputLimits {
+  max_input_bytes : Int
+  max_line_bytes : Int
+  max_records : Int
+  max_clock_domains : Int
+  max_field_bytes : Int
+  max_issues : Int
+  max_json_depth : Int
+}
+pub fn InputLimits::default() -> Self
+pub fn InputLimits::new(max_input_bytes? : Int, max_line_bytes? : Int, max_records? : Int, max_clock_domains? : Int, max_field_bytes? : Int, max_issues? : Int, max_json_depth? : Int) -> Self raise InputConfigError
+pub impl Default for InputLimits
+
+pub struct InputReport {
+  accepted_events : ReadOnlyArray[@model.Event]
+  issues : ReadOnlyArray[InputIssue]
+  status : InputStatus
+  records_seen : Int
+}
+pub fn InputReport::is_valid(Self) -> Bool
+pub fn InputReport::validated_events(Self) -> Array[@model.Event]?
+
+pub(all) enum InputStatus {
+  Complete
+  Limited(String)
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn InputStatus::equal(Self, Self) -> Bool
+#deprecated
+pub fn InputStatus::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn InputStatus::to_repr(Self) -> @debug.Repr
+
+pub(all) enum IssueKind {
+  InvalidJson
+  ExpectedObject
+  EmptyInput
+  MissingField(String)
+  WrongType(String)
+  UnknownField(String)
+  DuplicateField(String)
+  InvalidValue(String)
+  DuplicateEventId(first_line~ : Int)
+  LimitExceeded(String)
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn IssueKind::equal(Self, Self) -> Bool
+#deprecated
+pub fn IssueKind::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn IssueKind::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 
