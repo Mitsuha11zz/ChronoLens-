@@ -7,7 +7,7 @@
 | 根包 | 公开端到端入口与能力组合 | input、correlate、constraints、solver、report |
 | model | 公共事件、约束、配置和结果类型 | 标准库 |
 | input | JSONL 解析、字段校验、资源限制 | model |
-| correlate | 按消息键配对，报告缺失与歧义 | model |
+| correlate | 按消息键配对，报告缺失与歧义；输入报告门控入口 | model、input |
 | constraints | 将消息关系与先验转为差分约束 | model |
 | solver | 可行性判定、偏移区间、冲突见证 | model |
 | report | JSON／Markdown 与演示数据 | model |

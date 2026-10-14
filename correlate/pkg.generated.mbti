@@ -1,11 +1,96 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Mitsuha11zz/chronolens/correlate"
 
+import {
+  "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/model",
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn correlate(ArrayView[@model.Event], max_events? : Int) -> CorrelationReport raise CorrelationError
+
+pub fn correlate_input(@input.InputReport, max_events? : Int) -> CorrelationReport raise CorrelationError
 
 // Errors
+pub(all) suberror CorrelationError {
+  InvalidInput
+  InvalidEventLimit
+  EventLimitExceeded(limit~ : Int, count~ : Int)
+  DuplicateEventId(String)
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn CorrelationError::equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationError::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub(all) enum CorrelationIssueKind {
+  MissingSend
+  MissingReceive
+  Ambiguous
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn CorrelationIssueKind::equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationIssueKind::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationIssueKind::to_repr(Self) -> @debug.Repr
+
+pub struct CorrelationReport {
+  pairs : ReadOnlyArray[MessagePair]
+  unresolved : ReadOnlyArray[UnresolvedGroup]
+  stats : CorrelationStats
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn CorrelationReport::equal(Self, Self) -> Bool
+pub fn CorrelationReport::fully_paired(Self) -> Bool
+#deprecated
+pub fn CorrelationReport::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationReport::to_repr(Self) -> @debug.Repr
+
+pub struct CorrelationStats {
+  total_events : Int
+  group_count : Int
+  paired_groups : Int
+  unresolved_groups : Int
+  missing_groups : Int
+  ambiguous_groups : Int
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn CorrelationStats::equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationStats::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn CorrelationStats::to_repr(Self) -> @debug.Repr
+
+pub struct MessagePair {
+  key : @model.MessageKey
+  send_event : @model.Event
+  receive_event : @model.Event
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn MessagePair::equal(Self, Self) -> Bool
+#deprecated
+pub fn MessagePair::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn MessagePair::to_repr(Self) -> @debug.Repr
+
+pub struct UnresolvedGroup {
+  key : @model.MessageKey
+  send_events : ReadOnlyArray[@model.Event]
+  receive_events : ReadOnlyArray[@model.Event]
+  issues : ReadOnlyArray[CorrelationIssueKind]
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn UnresolvedGroup::equal(Self, Self) -> Bool
+#deprecated
+pub fn UnresolvedGroup::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn UnresolvedGroup::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 
