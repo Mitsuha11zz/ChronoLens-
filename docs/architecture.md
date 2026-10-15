@@ -1,6 +1,6 @@
 # 包职责与依赖规划
 
-当前为骨架阶段，以下依赖是后续实现规划，尚未写入包配置。
+model、input、correlate、constraints 已实现；其余包的依赖仍为后续规划。
 
 | 包 | 职责 | 拟依赖 |
 | --- | --- | --- |
@@ -8,7 +8,7 @@
 | model | 公共事件、约束、配置和结果类型 | 标准库 |
 | input | JSONL 解析、字段校验、资源限制 | model |
 | correlate | 按消息键配对，报告缺失与歧义；输入报告门控入口 | model、input |
-| constraints | 将消息关系与先验转为差分约束 | model |
+| constraints | 将唯一消息对与显式偏移先验转为差分约束，保留未解决证据 | model、correlate |
 | solver | 可行性判定、偏移区间、冲突见证 | model |
 | report | JSON／Markdown 与演示数据 | model |
 | cmd/chronolens | 参数、文件 IO 与退出码 | 根包、report |
