@@ -1,0 +1,6 @@
+{"event_id":"ab-send","clock_id":"A","trace_id":"cycle","message_id":"ab","attempt":0,"kind":"send","ts_us":"100"}
+{"event_id":"ab-receive","clock_id":"B","trace_id":"cycle","message_id":"ab","attempt":0,"kind":"receive","ts_us":"90"}
+{"event_id":"bc-send","clock_id":"B","trace_id":"cycle","message_id":"bc","attempt":0,"kind":"send","ts_us":"100"}
+{"event_id":"bc-receive","clock_id":"C","trace_id":"cycle","message_id":"bc","attempt":0,"kind":"receive","ts_us":"90"}
+{"event_id":"ca-send","clock_id":"C","trace_id":"cycle","message_id":"ca","attempt":0,"kind":"send","ts_us":"100"}
+{"event_id":"ca-receive","clock_id":"A","trace_id":"cycle","message_id":"ca","attempt":0,"kind":"receive","ts_us":"90"}

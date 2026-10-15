@@ -1,11 +1,136 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Mitsuha11zz/chronolens/solver"
 
+import {
+  "Mitsuha11zz/chronolens/constraints",
+  "Mitsuha11zz/chronolens/model",
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn solve(@constraints.ConstraintSet, limits? : SolveLimits) -> SolveReport raise SolveError
+
+pub fn solve_constraints(ArrayView[@model.DifferenceConstraint], clock_ids? : ArrayView[String], limits? : SolveLimits) -> ConstraintSolution raise SolveError
 
 // Errors
+pub(all) suberror SolveError {
+  InvalidLimit(String)
+  ClockLimitExceeded(Int)
+  ConstraintLimitExceeded(Int)
+  EmptyClockId
+  EdgeVisitLimitExceeded(Int64)
+  ArithmeticOverflow(phase~ : SolvePhase, constraint_index~ : Int)
+  InvalidWitness
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn SolveError::equal(Self, Self) -> Bool
+#deprecated
+pub fn SolveError::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn SolveError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub struct ClockOffset {
+  clock_id : String
+  offset_us : Int64
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ClockOffset::equal(Self, Self) -> Bool
+#deprecated
+pub fn ClockOffset::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ClockOffset::to_repr(Self) -> @debug.Repr
+
+pub struct ConstraintSolution {
+  clocks : ReadOnlyArray[String]
+  constraints : ReadOnlyArray[@model.DifferenceConstraint]
+  outcome : Feasibility
+  stats : SolveStats
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ConstraintSolution::equal(Self, Self) -> Bool
+#deprecated
+pub fn ConstraintSolution::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ConstraintSolution::to_repr(Self) -> @debug.Repr
+
+pub struct CycleEdge {
+  constraint_index : Int
+  constraint : @model.DifferenceConstraint
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn CycleEdge::equal(Self, Self) -> Bool
+#deprecated
+pub fn CycleEdge::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn CycleEdge::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Feasibility {
+  Feasible(offsets~ : ReadOnlyArray[ClockOffset])
+  Infeasible(cycle~ : NegativeCycle)
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn Feasibility::equal(Self, Self) -> Bool
+#deprecated
+pub fn Feasibility::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn Feasibility::to_repr(Self) -> @debug.Repr
+
+pub struct NegativeCycle {
+  edges : ReadOnlyArray[CycleEdge]
+  total_weight_us : Int64
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn NegativeCycle::equal(Self, Self) -> Bool
+#deprecated
+pub fn NegativeCycle::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn NegativeCycle::to_repr(Self) -> @debug.Repr
+
+pub struct SolveLimits {
+  max_clocks : Int
+  max_constraints : Int
+  max_edge_visits : Int64
+}
+pub fn SolveLimits::default() -> Self
+pub fn SolveLimits::new(max_clocks? : Int, max_constraints? : Int, max_edge_visits? : Int64) -> Self raise SolveError
+pub impl Default for SolveLimits
+
+pub(all) enum SolvePhase {
+  Relaxation
+  FeasibleVerification
+  CycleWeightSum
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn SolvePhase::equal(Self, Self) -> Bool
+#deprecated
+pub fn SolvePhase::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn SolvePhase::to_repr(Self) -> @debug.Repr
+
+pub struct SolveReport {
+  input : @constraints.ConstraintSet
+  solution : ConstraintSolution
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn SolveReport::equal(Self, Self) -> Bool
+#deprecated
+pub fn SolveReport::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn SolveReport::to_repr(Self) -> @debug.Repr
+
+pub struct SolveStats {
+  clock_count : Int
+  constraint_count : Int
+  passes : Int
+  edge_visits : Int64
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn SolveStats::equal(Self, Self) -> Bool
+#deprecated
+pub fn SolveStats::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn SolveStats::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 
