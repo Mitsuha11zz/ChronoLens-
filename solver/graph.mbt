@@ -52,7 +52,7 @@ fn index_graph(
     add_clock(constraint.edge_to(), names, limits.max_clocks)
   }
   let clocks = Array::from_iter(names.keys())
-  clocks.sort_by((a, b) => a.compare(b))
+  clocks.sort_by((a, b) => a.lexical_compare(b))
   let indices : Map[String, Int] = Map([])
   for i, clock in clocks {
     indices[clock] = i

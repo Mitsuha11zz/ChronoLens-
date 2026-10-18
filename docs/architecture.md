@@ -1,6 +1,6 @@
 # 包职责与依赖规划
 
-model、input、correlate、constraints 及 solver 的可行性功能已实现；其余能力的依赖仍为后续规划。
+model、input、correlate、constraints 及 solver 的可行性、区间与分量分析已实现；其余能力的依赖仍为后续规划。
 
 | 包 | 职责 | 拟依赖 |
 | --- | --- | --- |
@@ -9,7 +9,7 @@ model、input、correlate、constraints 及 solver 的可行性功能已实现�
 | input | JSONL 解析、字段校验、资源限制 | model |
 | correlate | 按消息键配对，报告缺失与歧义；输入报告门控入口 | model、input |
 | constraints | 将唯一消息对与显式偏移先验转为差分约束，保留未解决证据 | model、correlate |
-| solver | 已实现全图可行性判定与冲突见证；偏移区间及分量分析待实现 | model、constraints |
+| solver | 全图可行性、负环见证、参考坐标下的偏移区间与独立分量分析 | model、constraints |
 | report | JSON／Markdown 与演示数据 | model |
 | cmd/chronolens | 参数、文件 IO 与退出码 | 根包、report |
 | demo | 浏览器中的结果与证据展示 | 经验证的核心后端或结果适配层 |

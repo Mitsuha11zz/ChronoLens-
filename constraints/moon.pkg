@@ -4,3 +4,8 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/int64",
 }
+
+import {
+  "Mitsuha11zz/chronolens/input",
+  "moonbitlang/core/bigint",
+} for "test"

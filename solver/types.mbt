@@ -1,6 +1,6 @@
 ///|
-/// Offsets use the same relative coordinate system, with no UTC anchor.
-/// The implicit zero-cost super-source makes every returned offset <= 0.
+/// Offsets share a relative coordinate system, with no UTC anchor.
+/// solve returns super-source coordinates; analyze uses a component reference.
 pub struct ClockOffset {
   clock_id : String
   offset_us : Int64
@@ -58,6 +58,8 @@ pub(all) enum SolvePhase {
   Relaxation
   FeasibleVerification
   CycleWeightSum
+  UpperBoundPaths
+  LowerBoundPaths
 } derive(Debug, Eq)
 
 ///|
@@ -67,6 +69,9 @@ pub(all) suberror SolveError {
   ClockLimitExceeded(Int)
   ConstraintLimitExceeded(Int)
   EmptyClockId
+  UnknownReferenceClock(String)
+  OffsetOverflow(clock_id~ : String, reference_clock~ : String)
+  BoundOverflow(clock_id~ : String, lower_bound~ : Bool)
   EdgeVisitLimitExceeded(Int64)
   ArithmeticOverflow(phase~ : SolvePhase, constraint_index~ : Int)
   InvalidWitness

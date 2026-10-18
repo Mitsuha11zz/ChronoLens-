@@ -8,11 +8,26 @@ pub fn solve_constraints(
   limits? : SolveLimits = SolveLimits::default(),
 ) -> ConstraintSolution raise SolveError {
   let graph = index_graph(constraints, clock_ids, limits)
+  let budget = Budget::{ limit: limits.max_edge_visits, used: 0L, passes: 0, }
+  let outcome = solve_graph(graph, budget)
+  {
+    clocks: ReadOnlyArray::from_array(graph.clocks),
+    constraints: ReadOnlyArray::from_array(graph.constraints),
+    outcome,
+    stats: {
+      clock_count: graph.clocks.length(),
+      constraint_count: graph.edges.length(),
+      passes: budget.passes,
+      edge_visits: budget.used,
+    },
+  }
+}
+
+///|
+fn solve_graph(graph : Graph, budget : Budget) -> Feasibility raise SolveError {
   let count = graph.clocks.length()
   let distances = Array::make(count, 0L)
   let predecessors = Array::make(count, -1)
-  let budget = Budget::{ limit: limits.max_edge_visits, used: 0L, }
-  let mut passes = 0
   let mut cycle_node = -1
   // Zero initialization is an implicit super-source covering every component.
   for pass = 0; pass < count; pass = pass + 1 {
@@ -20,12 +35,12 @@ pub fn solve_constraints(
       break
     }
     let mut updated_node = -1
-    for edge in graph.edges {
+    for position, edge in graph.edges {
       budget.visit()
       // A negative self-loop is already a complete witness; repeated
       // relaxation could otherwise underflow before the V-th pass.
       if edge.from == edge.to && edge.weight < 0L {
-        predecessors[edge.to] = edge.index
+        predecessors[edge.to] = position
         cycle_node = edge.to
         break
       }
@@ -37,11 +52,11 @@ pub fn solve_constraints(
       )
       if candidate < distances[edge.to] {
         distances[edge.to] = candidate
-        predecessors[edge.to] = edge.index
+        predecessors[edge.to] = position
         updated_node = edge.to
       }
     }
-    passes += 1
+    budget.passes += 1
     if cycle_node >= 0 {
       break
     }
@@ -52,7 +67,7 @@ pub fn solve_constraints(
       cycle_node = updated_node
     }
   }
-  let outcome = if cycle_node >= 0 {
+  if cycle_node >= 0 {
     Infeasible(cycle=extract_cycle(cycle_node, predecessors, graph, budget))
   } else {
     verify_offsets(distances, graph, budget)
@@ -61,17 +76,6 @@ pub fn solve_constraints(
       offsets.push({ clock_id, offset_us: distances[i], })
     }
     Feasible(offsets=ReadOnlyArray::from_array(offsets))
-  }
-  {
-    clocks: ReadOnlyArray::from_array(graph.clocks),
-    constraints: ReadOnlyArray::from_array(graph.constraints),
-    outcome,
-    stats: {
-      clock_count: count,
-      constraint_count: graph.edges.length(),
-      passes,
-      edge_visits: budget.used,
-    },
   }
 }
 

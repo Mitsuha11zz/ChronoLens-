@@ -1,0 +1,9 @@
+{"event_id":"a-send","clock_id":"A","trace_id":"bounded","message_id":"request","attempt":0,"kind":"send","ts_us":"1000000"}
+{"event_id":"b-receive","clock_id":"B","trace_id":"bounded","message_id":"request","attempt":0,"kind":"receive","ts_us":"900000"}
+{"event_id":"b-send","clock_id":"B","trace_id":"bounded","message_id":"response","attempt":0,"kind":"send","ts_us":"940000"}
+{"event_id":"a-receive","clock_id":"A","trace_id":"bounded","message_id":"response","attempt":0,"kind":"receive","ts_us":"1100000"}
+{"event_id":"c-send","clock_id":"C","trace_id":"one-way","message_id":"cd","attempt":0,"kind":"send","ts_us":"100"}
+{"event_id":"d-receive","clock_id":"D","trace_id":"one-way","message_id":"cd","attempt":0,"kind":"receive","ts_us":"150"}
+{"event_id":"e-send","clock_id":"E","trace_id":"isolated","message_id":"missing","attempt":0,"kind":"send","ts_us":"100"}
+{"event_id":"f-send","clock_id":"F","trace_id":"conflict","message_id":"self","attempt":0,"kind":"send","ts_us":"100"}
+{"event_id":"f-receive","clock_id":"F","trace_id":"conflict","message_id":"self","attempt":0,"kind":"receive","ts_us":"90"}

@@ -37,6 +37,7 @@ pub extend SolveLimits with Default::{default}
 priv struct Budget {
   limit : Int64
   mut used : Int64
+  mut passes : Int
 }
 
 ///|

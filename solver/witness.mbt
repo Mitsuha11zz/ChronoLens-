@@ -119,15 +119,25 @@ fn verify_offsets(
 ) -> Unit raise SolveError {
   for edge in graph.edges {
     budget.visit()
-    // Compare to a checked sum instead of subtracting two offsets.
-    let upper = checked_add(
-      distances[edge.from],
-      edge.weight,
-      FeasibleVerification,
-      edge.index,
-    )
-    if distances[edge.to] > upper {
+    if !satisfies_constraint(
+        distances[edge.to],
+        distances[edge.from],
+        edge.weight,
+      ) {
       raise InvalidWitness
     }
   }
+}
+
+///|
+/// Compare the mathematical sum even when a reference shift makes the RHS
+/// exceed Int64. A RHS above MAX always succeeds; below MIN always fails.
+fn satisfies_constraint(left : Int64, right : Int64, weight : Int64) -> Bool {
+  if weight > 0L && right > @int64.MAX_VALUE - weight {
+    return true
+  }
+  if weight < 0L && right < @int64.MIN_VALUE - weight {
+    return false
+  }
+  left <= right + weight
 }

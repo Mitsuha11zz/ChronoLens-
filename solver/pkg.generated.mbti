@@ -8,6 +8,10 @@ import {
 }
 
 // Values
+pub fn analyze(@constraints.ConstraintSet, reference_clock? : String, limits? : SolveLimits) -> AnalysisReport raise SolveError
+
+pub fn analyze_constraints(ArrayView[@model.DifferenceConstraint], clock_ids? : ArrayView[String], reference_clock? : String, limits? : SolveLimits) -> ConstraintAnalysis raise SolveError
+
 pub fn solve(@constraints.ConstraintSet, limits? : SolveLimits) -> SolveReport raise SolveError
 
 pub fn solve_constraints(ArrayView[@model.DifferenceConstraint], clock_ids? : ArrayView[String], limits? : SolveLimits) -> ConstraintSolution raise SolveError
@@ -18,6 +22,9 @@ pub(all) suberror SolveError {
   ClockLimitExceeded(Int)
   ConstraintLimitExceeded(Int)
   EmptyClockId
+  UnknownReferenceClock(String)
+  OffsetOverflow(clock_id~ : String, reference_clock~ : String)
+  BoundOverflow(clock_id~ : String, lower_bound~ : Bool)
   EdgeVisitLimitExceeded(Int64)
   ArithmeticOverflow(phase~ : SolvePhase, constraint_index~ : Int)
   InvalidWitness
@@ -30,6 +37,17 @@ pub fn SolveError::not_equal(Self, Self) -> Bool
 pub fn SolveError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub struct AnalysisReport {
+  input : @constraints.ConstraintSet
+  analysis : ConstraintAnalysis
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn AnalysisReport::equal(Self, Self) -> Bool
+#deprecated
+pub fn AnalysisReport::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn AnalysisReport::to_repr(Self) -> @debug.Repr
+
 pub struct ClockOffset {
   clock_id : String
   offset_us : Int64
@@ -40,6 +58,46 @@ pub fn ClockOffset::equal(Self, Self) -> Bool
 pub fn ClockOffset::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ClockOffset::to_repr(Self) -> @debug.Repr
+
+pub struct ComponentAnalysis {
+  component_id : Int
+  clocks : ReadOnlyArray[String]
+  reference_clock : String
+  constraint_indices : ReadOnlyArray[Int]
+  outcome : ComponentOutcome
+  stats : SolveStats
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ComponentAnalysis::equal(Self, Self) -> Bool
+#deprecated
+pub fn ComponentAnalysis::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ComponentAnalysis::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ComponentOutcome {
+  ComponentFeasible(offsets~ : ReadOnlyArray[ClockOffset], intervals~ : ReadOnlyArray[OffsetInterval])
+  ComponentInfeasible(cycle~ : NegativeCycle)
+  ComponentFailed(error~ : SolveError)
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ComponentOutcome::equal(Self, Self) -> Bool
+#deprecated
+pub fn ComponentOutcome::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ComponentOutcome::to_repr(Self) -> @debug.Repr
+
+pub struct ConstraintAnalysis {
+  clocks : ReadOnlyArray[String]
+  constraints : ReadOnlyArray[@model.DifferenceConstraint]
+  components : ReadOnlyArray[ComponentAnalysis]
+  stats : SolveStats
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ConstraintAnalysis::equal(Self, Self) -> Bool
+#deprecated
+pub fn ConstraintAnalysis::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ConstraintAnalysis::to_repr(Self) -> @debug.Repr
 
 pub struct ConstraintSolution {
   clocks : ReadOnlyArray[String]
@@ -87,6 +145,29 @@ pub fn NegativeCycle::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn NegativeCycle::to_repr(Self) -> @debug.Repr
 
+pub(all) enum OffsetBound {
+  Finite(Int64)
+  Unbounded
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn OffsetBound::equal(Self, Self) -> Bool
+#deprecated
+pub fn OffsetBound::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn OffsetBound::to_repr(Self) -> @debug.Repr
+
+pub struct OffsetInterval {
+  clock_id : String
+  lower : OffsetBound
+  upper : OffsetBound
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn OffsetInterval::equal(Self, Self) -> Bool
+#deprecated
+pub fn OffsetInterval::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn OffsetInterval::to_repr(Self) -> @debug.Repr
+
 pub struct SolveLimits {
   max_clocks : Int
   max_constraints : Int
@@ -100,6 +181,8 @@ pub(all) enum SolvePhase {
   Relaxation
   FeasibleVerification
   CycleWeightSum
+  UpperBoundPaths
+  LowerBoundPaths
 } derive(Eq, @debug.Debug)
 #deprecated
 pub fn SolvePhase::equal(Self, Self) -> Bool
