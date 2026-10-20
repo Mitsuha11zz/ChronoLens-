@@ -1,0 +1,134 @@
+{
+  "assumptions": [
+    "fixed_offsets_within_analysis_window",
+    "only_explicit_unique_message_pairs_create_message_constraints",
+    "relation_tolerance_and_priors_are_assumptions",
+    "representative_offsets_are_not_utc",
+    "components_have_independent_coordinates",
+    "interval_endpoints_are_marginal",
+    "negative_cycles_do_not_determine_root_cause"
+  ],
+  "components": [
+    {
+      "clock_ids": [
+        "I"
+      ],
+      "component_id": 0,
+      "constraint_indices": [],
+      "cycle": null,
+      "error": null,
+      "intervals": [
+        {
+          "clock_id": "I",
+          "lower": {
+            "kind": "finite",
+            "value_us": "0"
+          },
+          "upper": {
+            "kind": "finite",
+            "value_us": "0"
+          }
+        }
+      ],
+      "offsets": [
+        {
+          "clock_id": "I",
+          "offset_us": "0"
+        }
+      ],
+      "reference_clock": "I",
+      "stats": {
+        "clock_count": 1,
+        "constraint_count": 0,
+        "edge_visits": "0",
+        "passes": 0
+      },
+      "status": "feasible"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "ambiguous_groups": 0,
+    "group_count": 1,
+    "log_completeness": "unknown",
+    "missing_groups": 1,
+    "paired_groups": 0,
+    "pairing_status": "has_unresolved_groups",
+    "total_events": 1,
+    "unresolved_groups": 1
+  },
+  "events": [
+    {
+      "attempt": 0,
+      "clock_id": "I",
+      "event_id": "isolated-max",
+      "kind": "send",
+      "message_id": "missing",
+      "source": {
+        "line": 1,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t",
+      "ts_us": "9223372036854775807"
+    }
+  ],
+  "failure": null,
+  "has_conflicts": false,
+  "input": {
+    "accepted_event_count": 1,
+    "events_are_preview": false,
+    "issues": [],
+    "limited_by": null,
+    "records_seen": 1,
+    "scan_status": "complete",
+    "validation": "valid"
+  },
+  "int64_encoding": "decimal_string",
+  "messages": [],
+  "model": {
+    "clock_model": "fixed_offset_per_clock_id",
+    "constraint_definition": "offset(left) - offset(right) <= upper_bound_us",
+    "priors": [],
+    "reference_scope": "weak_component",
+    "relation_tolerance_us": "0",
+    "resource_limits": null,
+    "resource_limits_recording": "not_available_in_source_reports",
+    "time_definition": "observed_timestamp_us + offset_us"
+  },
+  "producer": {
+    "module": "Mitsuha11zz/chronolens",
+    "version": "0.1.0"
+  },
+  "schema_version": "chronolens.diagnostic.v1",
+  "status": "no_constraints",
+  "summary": {
+    "component_count": 1,
+    "failed_components": 0,
+    "feasible_components": 1,
+    "infeasible_components": 0,
+    "stats": {
+      "clock_count": 1,
+      "constraint_count": 0,
+      "edge_visits": "0",
+      "passes": 0
+    },
+    "unbounded_clock_count": 0
+  },
+  "time_unit": "us",
+  "unresolved_groups": [
+    {
+      "issues": [
+        "missing_receive"
+      ],
+      "key": {
+        "attempt": 0,
+        "message_id": "missing",
+        "trace_id": "t"
+      },
+      "receive_event_ids": [],
+      "send_event_ids": [
+        "isolated-max"
+      ]
+    }
+  ]
+}

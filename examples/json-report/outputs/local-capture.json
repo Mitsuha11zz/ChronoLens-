@@ -1,0 +1,485 @@
+{
+  "assumptions": [
+    "fixed_offsets_within_analysis_window",
+    "only_explicit_unique_message_pairs_create_message_constraints",
+    "relation_tolerance_and_priors_are_assumptions",
+    "representative_offsets_are_not_utc",
+    "components_have_independent_coordinates",
+    "interval_endpoints_are_marginal",
+    "negative_cycles_do_not_determine_root_cause"
+  ],
+  "components": [
+    {
+      "clock_ids": [
+        "A",
+        "B"
+      ],
+      "component_id": 0,
+      "constraint_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "cycle": null,
+      "error": null,
+      "intervals": [
+        {
+          "clock_id": "A",
+          "lower": {
+            "kind": "finite",
+            "value_us": "0"
+          },
+          "upper": {
+            "kind": "finite",
+            "value_us": "0"
+          }
+        },
+        {
+          "clock_id": "B",
+          "lower": {
+            "kind": "finite",
+            "value_us": "119931"
+          },
+          "upper": {
+            "kind": "finite",
+            "value_us": "120109"
+          }
+        }
+      ],
+      "offsets": [
+        {
+          "clock_id": "A",
+          "offset_us": "0"
+        },
+        {
+          "clock_id": "B",
+          "offset_us": "119931"
+        }
+      ],
+      "reference_clock": "A",
+      "stats": {
+        "clock_count": 2,
+        "constraint_count": 6,
+        "edge_visits": "36",
+        "passes": 4
+      },
+      "status": "feasible"
+    }
+  ],
+  "constraints": [
+    {
+      "edge_from": "B",
+      "edge_to": "A",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "request-0001",
+          "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001"
+        },
+        "kind": "message",
+        "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:send"
+      },
+      "index": 0,
+      "left_clock": "A",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:receive",
+        "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:send"
+      },
+      "right_clock": "B",
+      "upper_bound_us": "-119596"
+    },
+    {
+      "edge_from": "A",
+      "edge_to": "B",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "response-0001",
+          "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001"
+        },
+        "kind": "message",
+        "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:send"
+      },
+      "index": 1,
+      "left_clock": "B",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:receive",
+        "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:send"
+      },
+      "right_clock": "A",
+      "upper_bound_us": "120441"
+    },
+    {
+      "edge_from": "B",
+      "edge_to": "A",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "request-0002",
+          "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002"
+        },
+        "kind": "message",
+        "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:send"
+      },
+      "index": 2,
+      "left_clock": "A",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:receive",
+        "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:send"
+      },
+      "right_clock": "B",
+      "upper_bound_us": "-119931"
+    },
+    {
+      "edge_from": "A",
+      "edge_to": "B",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "response-0002",
+          "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002"
+        },
+        "kind": "message",
+        "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:send"
+      },
+      "index": 3,
+      "left_clock": "B",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:receive",
+        "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:send"
+      },
+      "right_clock": "A",
+      "upper_bound_us": "120187"
+    },
+    {
+      "edge_from": "B",
+      "edge_to": "A",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "request-0003",
+          "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003"
+        },
+        "kind": "message",
+        "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:send"
+      },
+      "index": 4,
+      "left_clock": "A",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:receive",
+        "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:send"
+      },
+      "right_clock": "B",
+      "upper_bound_us": "-119895"
+    },
+    {
+      "edge_from": "A",
+      "edge_to": "B",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "response-0003",
+          "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003"
+        },
+        "kind": "message",
+        "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:send"
+      },
+      "index": 5,
+      "left_clock": "B",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:receive",
+        "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:send"
+      },
+      "right_clock": "A",
+      "upper_bound_us": "120109"
+    }
+  ],
+  "coverage": {
+    "ambiguous_groups": 0,
+    "group_count": 6,
+    "log_completeness": "unknown",
+    "missing_groups": 0,
+    "paired_groups": 6,
+    "pairing_status": "fully_paired",
+    "total_events": 12,
+    "unresolved_groups": 0
+  },
+  "events": [
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:send",
+      "kind": "send",
+      "message_id": "request-0001",
+      "source": {
+        "line": 1,
+        "path": "service-a.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001",
+      "ts_us": "1792468311342655"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:receive",
+      "kind": "receive",
+      "message_id": "response-0001",
+      "source": {
+        "line": 2,
+        "path": "service-a.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001",
+      "ts_us": "1792468311353646"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:send",
+      "kind": "send",
+      "message_id": "request-0002",
+      "source": {
+        "line": 3,
+        "path": "service-a.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002",
+      "ts_us": "1792468311353687"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:receive",
+      "kind": "receive",
+      "message_id": "response-0002",
+      "source": {
+        "line": 4,
+        "path": "service-a.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002",
+      "ts_us": "1792468311363997"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:send",
+      "kind": "send",
+      "message_id": "request-0003",
+      "source": {
+        "line": 5,
+        "path": "service-a.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003",
+      "ts_us": "1792468311364088"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:receive",
+      "kind": "receive",
+      "message_id": "response-0003",
+      "source": {
+        "line": 6,
+        "path": "service-a.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003",
+      "ts_us": "1792468311374829"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:receive",
+      "kind": "receive",
+      "message_id": "request-0001",
+      "source": {
+        "line": 1,
+        "path": "service-b.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001",
+      "ts_us": "1792468311223059"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:send",
+      "kind": "send",
+      "message_id": "response-0001",
+      "source": {
+        "line": 2,
+        "path": "service-b.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001",
+      "ts_us": "1792468311233205"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:receive",
+      "kind": "receive",
+      "message_id": "request-0002",
+      "source": {
+        "line": 3,
+        "path": "service-b.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002",
+      "ts_us": "1792468311233756"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:send",
+      "kind": "send",
+      "message_id": "response-0002",
+      "source": {
+        "line": 4,
+        "path": "service-b.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002",
+      "ts_us": "1792468311243810"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:receive",
+      "kind": "receive",
+      "message_id": "request-0003",
+      "source": {
+        "line": 5,
+        "path": "service-b.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003",
+      "ts_us": "1792468311244193"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:send",
+      "kind": "send",
+      "message_id": "response-0003",
+      "source": {
+        "line": 6,
+        "path": "service-b.raw.jsonl"
+      },
+      "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003",
+      "ts_us": "1792468311254720"
+    }
+  ],
+  "failure": null,
+  "has_conflicts": false,
+  "input": {
+    "accepted_event_count": 12,
+    "events_are_preview": false,
+    "issues": [],
+    "limited_by": null,
+    "records_seen": 12,
+    "scan_status": "complete",
+    "validation": "valid"
+  },
+  "int64_encoding": "decimal_string",
+  "messages": [
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "request-0001",
+        "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001"
+      },
+      "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:receive",
+      "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:request-0001:send"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "response-0001",
+        "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0001"
+      },
+      "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:receive",
+      "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0001:response-0001:send"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "request-0002",
+        "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002"
+      },
+      "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:receive",
+      "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:request-0002:send"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "response-0002",
+        "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0002"
+      },
+      "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:receive",
+      "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0002:response-0002:send"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "request-0003",
+        "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003"
+      },
+      "receive_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:receive",
+      "send_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:request-0003:send"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "response-0003",
+        "trace_id": "d9141fa794234bdc89ee826fe9e643e3-0003"
+      },
+      "receive_event_id": "A:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:receive",
+      "send_event_id": "B:d9141fa794234bdc89ee826fe9e643e3-0003:response-0003:send"
+    }
+  ],
+  "model": {
+    "clock_model": "fixed_offset_per_clock_id",
+    "constraint_definition": "offset(left) - offset(right) <= upper_bound_us",
+    "priors": [],
+    "reference_scope": "weak_component",
+    "relation_tolerance_us": "0",
+    "resource_limits": null,
+    "resource_limits_recording": "not_available_in_source_reports",
+    "time_definition": "observed_timestamp_us + offset_us"
+  },
+  "producer": {
+    "module": "Mitsuha11zz/chronolens",
+    "version": "0.1.0"
+  },
+  "schema_version": "chronolens.diagnostic.v1",
+  "status": "feasible",
+  "summary": {
+    "component_count": 1,
+    "failed_components": 0,
+    "feasible_components": 1,
+    "infeasible_components": 0,
+    "stats": {
+      "clock_count": 2,
+      "constraint_count": 6,
+      "edge_visits": "48",
+      "passes": 4
+    },
+    "unbounded_clock_count": 0
+  },
+  "time_unit": "us",
+  "unresolved_groups": []
+}

@@ -1,0 +1,44 @@
+{
+  "assumptions": [
+    "fixed_offsets_within_analysis_window",
+    "only_explicit_unique_message_pairs_create_message_constraints",
+    "relation_tolerance_and_priors_are_assumptions",
+    "representative_offsets_are_not_utc",
+    "components_have_independent_coordinates",
+    "interval_endpoints_are_marginal",
+    "negative_cycles_do_not_determine_root_cause"
+  ],
+  "components": [],
+  "constraints": [],
+  "coverage": null,
+  "events": [],
+  "failure": null,
+  "has_conflicts": null,
+  "input": {
+    "accepted_event_count": 0,
+    "events_are_preview": true,
+    "issues": [
+      {
+        "code": "invalid_json",
+        "details": {},
+        "line": 1
+      }
+    ],
+    "limited_by": null,
+    "records_seen": 1,
+    "scan_status": "complete",
+    "validation": "invalid"
+  },
+  "int64_encoding": "decimal_string",
+  "messages": [],
+  "model": null,
+  "producer": {
+    "module": "Mitsuha11zz/chronolens",
+    "version": "0.1.0"
+  },
+  "schema_version": "chronolens.diagnostic.v1",
+  "status": "input_invalid",
+  "summary": null,
+  "time_unit": "us",
+  "unresolved_groups": []
+}

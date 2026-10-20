@@ -1,6 +1,6 @@
 # 包职责与依赖规划
 
-model、input、correlate、constraints 及 solver 的可行性、区间与分量分析已实现；其余能力的依赖仍为后续规划。
+model、input、correlate、constraints、solver 的核心分析及 report 的 JSON 导出已实现；其余能力的依赖仍为后续规划。
 
 | 包 | 职责 | 拟依赖 |
 | --- | --- | --- |
@@ -10,10 +10,11 @@ model、input、correlate、constraints 及 solver 的可行性、区间与分�
 | correlate | 按消息键配对，报告缺失与歧义；输入报告门控入口 | model、input |
 | constraints | 将唯一消息对与显式偏移先验转为差分约束，保留未解决证据 | model、correlate |
 | solver | 全图可行性、负环见证、参考坐标下的偏移区间与独立分量分析 | model、constraints |
-| report | JSON／Markdown 与演示数据 | model |
+| report | 已实现 JSON 诊断导出；Markdown 待实现 | model、input、correlate、constraints、solver |
 | cmd/chronolens | 参数、文件 IO 与退出码 | 根包、report |
 | demo | 浏览器中的结果与证据展示 | 经验证的核心后端或结果适配层 |
 | examples/two-services | Python 标准库采集本机双进程 TCP 记录，转换后由 native 样例入口调用核心分析 | input、correlate、constraints、solver、core/env |
+| examples/json-report | native JSON 报告导出例程 | input、correlate、constraints、solver、report、core/env |
 
 `model/` 是公开包，用户需要构造、匹配或调用方法的公共类型由该包持有。后续增加内部扫描器等辅助包时，不将公共具体类型迁入 `internal/`。
 

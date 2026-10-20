@@ -1,0 +1,4 @@
+{"event_id":"one-send","clock_id":"B","trace_id":"t","message_id":"one","attempt":0,"kind":"send","ts_us":"0"}
+{"event_id":"one-receive","clock_id":"A","trace_id":"t","message_id":"one","attempt":0,"kind":"receive","ts_us":"-9223372036854775808"}
+{"event_id":"two-send","clock_id":"C","trace_id":"t","message_id":"two","attempt":0,"kind":"send","ts_us":"1"}
+{"event_id":"two-receive","clock_id":"B","trace_id":"t","message_id":"two","attempt":0,"kind":"receive","ts_us":"0"}

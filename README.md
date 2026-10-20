@@ -2,7 +2,7 @@
 
 MoonBit 实现的分布式日志时间约束诊断库，配套离线 CLI 与交互演示。
 
-项目目标是通过明确的消息发送／接收关系，计算固定时钟偏移的可行范围，并给出时间约束冲突的证据。当前已完成目录骨架、[基础数据模型](model/README.md)、[JSONL 输入解析和校验](input/README.md)、[消息配对与关联诊断](correlate/README.md)、[差分约束构建](constraints/README.md)，以及 [可行性、负环见证、偏移区间和分量分析](solver/README.md)。报告导出、诊断 CLI 和交互演示尚未实现。
+项目目标是通过明确的消息发送／接收关系，计算固定时钟偏移的可行范围，并给出时间约束冲突的证据。当前已完成目录骨架、[基础数据模型](model/README.md)、[JSONL 输入解析和校验](input/README.md)、[消息配对与关联诊断](correlate/README.md)、[差分约束构建](constraints/README.md)、[可行性与偏移区间](solver/README.md)，以及 [JSON 诊断报告](report/README.md)。Markdown 报告、诊断 CLI 和交互演示尚未实现。
 
 ## 目录结构
 
@@ -20,6 +20,7 @@ chronolens/
 ├── cmd/chronolens/           CLI 占位入口
 ├── demo/                    后续交互演示
 ├── examples/two-services/    本机双进程 TCP 采集、输入转换与核心分析样例
+├── examples/json-report/     JSON 报告导出例程及已生成的示例输出
 ├── fixtures/                后续输入与预期结果样例
 ├── docs/
 │   ├── 开发方案.md           已确认选题的完整方案
@@ -59,10 +60,16 @@ python examples/two-services/run.py --analyze
 python examples/two-services/run.py --replay examples/two-services/sample
 ```
 
-正式诊断 CLI、报告导出和生产容量仍待后续实现或验证。
+正式诊断 CLI、Markdown 报告和生产容量仍待后续实现或验证。
+
+## JSON 诊断报告
+
+report 包提供 from_input、from_analysis 和 from_failure，保留输入诊断、模型假设、关联覆盖、分量结果和冲突证据。Int64 使用十进制字符串，区分有限边界、无界和计算失败；结构版本为 chronolens.diagnostic.v1。
+
+详见 [报告契约](report/README.md) 和 [导出例程](examples/json-report/README.md)。已有 6 份 native 实际导出的 JSON 示例；本阶段未运行测试套件或 Schema 实例验证。
 
 ## 分阶段开发约定
 
 先完成目录骨架，再逐个实现功能。每个功能完成后汇报变更、验证结果与待确认事项，停止并等待用户确认。推送需获得用户明确授权。
 
-双进程实际采集与格式转换样例已完成，等待用户确认。下一步拟实现结构化 JSON 诊断报告，再继续 Markdown 报告与 CLI，详见 [进度记录](docs/progress.md)。
+结构化 JSON 诊断报告已完成，等待用户确认。下一步拟实现 Markdown 诊断报告，再继续正式 CLI，详见 [进度记录](docs/progress.md)。

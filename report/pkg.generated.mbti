@@ -1,11 +1,52 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Mitsuha11zz/chronolens/report"
 
+import {
+  "Mitsuha11zz/chronolens/constraints",
+  "Mitsuha11zz/chronolens/correlate",
+  "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/solver",
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn from_analysis(@solver.AnalysisReport, input? : @input.InputReport) -> DiagnosticReport raise ReportError
+
+pub fn from_failure(PipelineFailure, input? : @input.InputReport) -> DiagnosticReport
+
+pub fn from_input(@input.InputReport) -> DiagnosticReport
 
 // Errors
+pub(all) suberror ReportError {
+  InvalidInputReport
+  MismatchedInputEvents
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ReportError::equal(Self, Self) -> Bool
+#deprecated
+pub fn ReportError::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ReportError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub struct DiagnosticReport {
+  // private fields
+}
+pub fn DiagnosticReport::stringify(Self, pretty? : Bool) -> String
+pub fn DiagnosticReport::to_json(Self) -> Json
+
+pub(all) enum PipelineFailure {
+  InputConfiguration(@input.InputConfigError)
+  Correlation(@correlate.CorrelationError)
+  ConstraintBuild(@constraints.ConstraintBuildError)
+  Solver(@solver.SolveError)
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn PipelineFailure::equal(Self, Self) -> Bool
+#deprecated
+pub fn PipelineFailure::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn PipelineFailure::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

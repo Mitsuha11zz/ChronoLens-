@@ -1,1 +1,8 @@
-// Package scaffold. Imports will be added with the reviewed feature.
+import {
+  "Mitsuha11zz/chronolens/model",
+  "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/correlate",
+  "Mitsuha11zz/chronolens/constraints",
+  "Mitsuha11zz/chronolens/solver",
+  "moonbitlang/core/debug",
+}

@@ -1,0 +1,245 @@
+{
+  "assumptions": [
+    "fixed_offsets_within_analysis_window",
+    "only_explicit_unique_message_pairs_create_message_constraints",
+    "relation_tolerance_and_priors_are_assumptions",
+    "representative_offsets_are_not_utc",
+    "components_have_independent_coordinates",
+    "interval_endpoints_are_marginal",
+    "negative_cycles_do_not_determine_root_cause"
+  ],
+  "components": [
+    {
+      "clock_ids": [
+        "A",
+        "B"
+      ],
+      "component_id": 0,
+      "constraint_indices": [
+        0,
+        1
+      ],
+      "cycle": null,
+      "error": null,
+      "intervals": [
+        {
+          "clock_id": "A",
+          "lower": {
+            "kind": "finite",
+            "value_us": "0"
+          },
+          "upper": {
+            "kind": "finite",
+            "value_us": "0"
+          }
+        },
+        {
+          "clock_id": "B",
+          "lower": {
+            "kind": "finite",
+            "value_us": "100000"
+          },
+          "upper": {
+            "kind": "finite",
+            "value_us": "160000"
+          }
+        }
+      ],
+      "offsets": [
+        {
+          "clock_id": "A",
+          "offset_us": "0"
+        },
+        {
+          "clock_id": "B",
+          "offset_us": "100000"
+        }
+      ],
+      "reference_clock": "A",
+      "stats": {
+        "clock_count": 2,
+        "constraint_count": 2,
+        "edge_visits": "12",
+        "passes": 4
+      },
+      "status": "feasible"
+    }
+  ],
+  "constraints": [
+    {
+      "edge_from": "B",
+      "edge_to": "A",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "request-1",
+          "trace_id": "t1"
+        },
+        "kind": "message",
+        "receive_event_id": "b1",
+        "relation_tolerance_us": "0",
+        "send_event_id": "a1"
+      },
+      "index": 0,
+      "left_clock": "A",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "b1",
+        "send_event_id": "a1"
+      },
+      "right_clock": "B",
+      "upper_bound_us": "-100000"
+    },
+    {
+      "edge_from": "A",
+      "edge_to": "B",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "response-1",
+          "trace_id": "t1"
+        },
+        "kind": "message",
+        "receive_event_id": "a2",
+        "relation_tolerance_us": "0",
+        "send_event_id": "b2"
+      },
+      "index": 1,
+      "left_clock": "B",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "a2",
+        "send_event_id": "b2"
+      },
+      "right_clock": "A",
+      "upper_bound_us": "160000"
+    }
+  ],
+  "coverage": {
+    "ambiguous_groups": 0,
+    "group_count": 2,
+    "log_completeness": "unknown",
+    "missing_groups": 0,
+    "paired_groups": 2,
+    "pairing_status": "fully_paired",
+    "total_events": 4,
+    "unresolved_groups": 0
+  },
+  "events": [
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "a1",
+      "kind": "send",
+      "message_id": "request-1",
+      "source": {
+        "line": 1,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t1",
+      "ts_us": "1000000"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "a2",
+      "kind": "receive",
+      "message_id": "response-1",
+      "source": {
+        "line": 4,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t1",
+      "ts_us": "1100000"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "b1",
+      "kind": "receive",
+      "message_id": "request-1",
+      "source": {
+        "line": 2,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t1",
+      "ts_us": "900000"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "b2",
+      "kind": "send",
+      "message_id": "response-1",
+      "source": {
+        "line": 3,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t1",
+      "ts_us": "940000"
+    }
+  ],
+  "failure": null,
+  "has_conflicts": false,
+  "input": {
+    "accepted_event_count": 4,
+    "events_are_preview": false,
+    "issues": [],
+    "limited_by": null,
+    "records_seen": 4,
+    "scan_status": "complete",
+    "validation": "valid"
+  },
+  "int64_encoding": "decimal_string",
+  "messages": [
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "request-1",
+        "trace_id": "t1"
+      },
+      "receive_event_id": "b1",
+      "send_event_id": "a1"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "response-1",
+        "trace_id": "t1"
+      },
+      "receive_event_id": "a2",
+      "send_event_id": "b2"
+    }
+  ],
+  "model": {
+    "clock_model": "fixed_offset_per_clock_id",
+    "constraint_definition": "offset(left) - offset(right) <= upper_bound_us",
+    "priors": [],
+    "reference_scope": "weak_component",
+    "relation_tolerance_us": "0",
+    "resource_limits": null,
+    "resource_limits_recording": "not_available_in_source_reports",
+    "time_definition": "observed_timestamp_us + offset_us"
+  },
+  "producer": {
+    "module": "Mitsuha11zz/chronolens",
+    "version": "0.1.0"
+  },
+  "schema_version": "chronolens.diagnostic.v1",
+  "status": "feasible",
+  "summary": {
+    "component_count": 1,
+    "failed_components": 0,
+    "feasible_components": 1,
+    "infeasible_components": 0,
+    "stats": {
+      "clock_count": 2,
+      "constraint_count": 2,
+      "edge_visits": "16",
+      "passes": 4
+    },
+    "unbounded_clock_count": 0
+  },
+  "time_unit": "us",
+  "unresolved_groups": []
+}

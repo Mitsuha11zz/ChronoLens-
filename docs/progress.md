@@ -136,9 +136,23 @@ Python 语法编译、moon info、新样例包的 moon fmt、moon check --target
 
 2026-10-20：用户明确授权本阶段提交和推送，范围为双进程采集脚本、转换器、native 样例入口、实际采集归档及相关文档；提交与推送结果以 Git 记录为准。下一功能仍等待用户另行确认开始。
 
-## 下一功能：结构化 JSON 诊断报告（待用户确认开始）
+双进程样例已推送并核对远程与本地一致：`6acbec29865414d5520dc96c66eebf456e2e88e3`。
+
+## 2026-10-20：结构化 JSON 诊断报告
 
 整合输入质量、模型假设、分量状态、偏移范围和冲突证据，定义稳定的报告结构与 Int64 字符串编码。Markdown 报告、端到端 CLI 与交互演示分步实现。
+
+已实现 report.from_input、from_analysis、from_failure、DiagnosticReport、PipelineFailure、ReportError，以及独立 Json 导出和确定键序的 stringify。结构版本为 chronolens.diagnostic.v1，并附 JSON Schema。可选解析报告须与分析事件完全一致，拒绝无效或不匹配的输入证据。
+
+导出时间戳、偏移、边权、先验边界、环权和 edge_visits 等 Int64 为十进制字符串。报告分别标记输入非法、输入受限、未分析、阶段失败、可行、冲突、分量计算未完成和没有约束；has_conflicts 在未知时为 null。关联覆盖与可行性分别呈现，负环通过全局约束索引回查事件和先验。源报告未保存的资源限制不以默认值冒充。
+
+已通过 native 导出例程实际生成 6 份可解析 JSON，包括四事件、多分量冲突、故意非法输入、路径溢出、只有未配对事件和上阶段本机采集数据。Schema 已检查 JSON 语法；moon check --target all --deny-warn、moon info、新包 moon fmt 与 git diff --check 通过，无警告、无错误。本阶段未新增或运行测试套件，也未运行 Schema 实例验证。未提交、未推送，完成后停止等待用户确认。
+
+2026-10-20：用户明确授权本阶段提交和推送，范围为 JSON 诊断报告实现、v1 Schema、native 导出例程、6 份示例报告及相关文档；提交与推送结果以 Git 记录为准。下一功能仍等待用户另行确认开始。
+
+## 下一功能：Markdown 诊断报告（待用户确认开始）
+
+将相同诊断源渲染为便于阅读的摘要、分量区间、输入／关联问题和冲突证据，保持与 JSON 的状态和不确定性语义一致。随后单独实现正式文件分析 CLI。
 
 ## 后续功能顺序
 

@@ -1,0 +1,220 @@
+{
+  "assumptions": [
+    "fixed_offsets_within_analysis_window",
+    "only_explicit_unique_message_pairs_create_message_constraints",
+    "relation_tolerance_and_priors_are_assumptions",
+    "representative_offsets_are_not_utc",
+    "components_have_independent_coordinates",
+    "interval_endpoints_are_marginal",
+    "negative_cycles_do_not_determine_root_cause"
+  ],
+  "components": [
+    {
+      "clock_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "component_id": 0,
+      "constraint_indices": [
+        0,
+        1
+      ],
+      "cycle": null,
+      "error": {
+        "code": "arithmetic_overflow",
+        "details": {
+          "constraint_index": 1,
+          "phase": "relaxation"
+        }
+      },
+      "intervals": null,
+      "offsets": null,
+      "reference_clock": "A",
+      "stats": {
+        "clock_count": 3,
+        "constraint_count": 2,
+        "edge_visits": "2",
+        "passes": 0
+      },
+      "status": "failed"
+    }
+  ],
+  "constraints": [
+    {
+      "edge_from": "A",
+      "edge_to": "B",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "one",
+          "trace_id": "t"
+        },
+        "kind": "message",
+        "receive_event_id": "one-receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "one-send"
+      },
+      "index": 0,
+      "left_clock": "B",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "one-receive",
+        "send_event_id": "one-send"
+      },
+      "right_clock": "A",
+      "upper_bound_us": "-9223372036854775808"
+    },
+    {
+      "edge_from": "B",
+      "edge_to": "C",
+      "evidence": {
+        "key": {
+          "attempt": 0,
+          "message_id": "two",
+          "trace_id": "t"
+        },
+        "kind": "message",
+        "receive_event_id": "two-receive",
+        "relation_tolerance_us": "0",
+        "send_event_id": "two-send"
+      },
+      "index": 1,
+      "left_clock": "C",
+      "origin": {
+        "kind": "message",
+        "receive_event_id": "two-receive",
+        "send_event_id": "two-send"
+      },
+      "right_clock": "B",
+      "upper_bound_us": "-1"
+    }
+  ],
+  "coverage": {
+    "ambiguous_groups": 0,
+    "group_count": 2,
+    "log_completeness": "unknown",
+    "missing_groups": 0,
+    "paired_groups": 2,
+    "pairing_status": "fully_paired",
+    "total_events": 4,
+    "unresolved_groups": 0
+  },
+  "events": [
+    {
+      "attempt": 0,
+      "clock_id": "A",
+      "event_id": "one-receive",
+      "kind": "receive",
+      "message_id": "one",
+      "source": {
+        "line": 2,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t",
+      "ts_us": "-9223372036854775808"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "one-send",
+      "kind": "send",
+      "message_id": "one",
+      "source": {
+        "line": 1,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t",
+      "ts_us": "0"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "B",
+      "event_id": "two-receive",
+      "kind": "receive",
+      "message_id": "two",
+      "source": {
+        "line": 4,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t",
+      "ts_us": "0"
+    },
+    {
+      "attempt": 0,
+      "clock_id": "C",
+      "event_id": "two-send",
+      "kind": "send",
+      "message_id": "two",
+      "source": {
+        "line": 3,
+        "path": "report-example.jsonl"
+      },
+      "trace_id": "t",
+      "ts_us": "1"
+    }
+  ],
+  "failure": null,
+  "has_conflicts": null,
+  "input": {
+    "accepted_event_count": 4,
+    "events_are_preview": false,
+    "issues": [],
+    "limited_by": null,
+    "records_seen": 4,
+    "scan_status": "complete",
+    "validation": "valid"
+  },
+  "int64_encoding": "decimal_string",
+  "messages": [
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "one",
+        "trace_id": "t"
+      },
+      "receive_event_id": "one-receive",
+      "send_event_id": "one-send"
+    },
+    {
+      "key": {
+        "attempt": 0,
+        "message_id": "two",
+        "trace_id": "t"
+      },
+      "receive_event_id": "two-receive",
+      "send_event_id": "two-send"
+    }
+  ],
+  "model": {
+    "clock_model": "fixed_offset_per_clock_id",
+    "constraint_definition": "offset(left) - offset(right) <= upper_bound_us",
+    "priors": [],
+    "reference_scope": "weak_component",
+    "relation_tolerance_us": "0",
+    "resource_limits": null,
+    "resource_limits_recording": "not_available_in_source_reports",
+    "time_definition": "observed_timestamp_us + offset_us"
+  },
+  "producer": {
+    "module": "Mitsuha11zz/chronolens",
+    "version": "0.1.0"
+  },
+  "schema_version": "chronolens.diagnostic.v1",
+  "status": "analysis_incomplete",
+  "summary": {
+    "component_count": 1,
+    "failed_components": 1,
+    "feasible_components": 0,
+    "infeasible_components": 0,
+    "stats": {
+      "clock_count": 3,
+      "constraint_count": 2,
+      "edge_visits": "6",
+      "passes": 0
+    },
+    "unbounded_clock_count": 0
+  },
+  "time_unit": "us",
+  "unresolved_groups": []
+}
