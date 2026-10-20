@@ -1,0 +1,6 @@
+{"schema":"chronolens.local-rpc.v1","service":"A","process_id":50152,"phase":"request_send","trace_id":"d9141fa794234bdc89ee826fe9e643e3-0001","message_id":"request-0001","attempt":0,"ts_unix_us":"1792468311342655"}
+{"schema":"chronolens.local-rpc.v1","service":"A","process_id":50152,"phase":"response_receive","trace_id":"d9141fa794234bdc89ee826fe9e643e3-0001","message_id":"response-0001","attempt":0,"ts_unix_us":"1792468311353646"}
+{"schema":"chronolens.local-rpc.v1","service":"A","process_id":50152,"phase":"request_send","trace_id":"d9141fa794234bdc89ee826fe9e643e3-0002","message_id":"request-0002","attempt":0,"ts_unix_us":"1792468311353687"}
+{"schema":"chronolens.local-rpc.v1","service":"A","process_id":50152,"phase":"response_receive","trace_id":"d9141fa794234bdc89ee826fe9e643e3-0002","message_id":"response-0002","attempt":0,"ts_unix_us":"1792468311363997"}
+{"schema":"chronolens.local-rpc.v1","service":"A","process_id":50152,"phase":"request_send","trace_id":"d9141fa794234bdc89ee826fe9e643e3-0003","message_id":"request-0003","attempt":0,"ts_unix_us":"1792468311364088"}
+{"schema":"chronolens.local-rpc.v1","service":"A","process_id":50152,"phase":"response_receive","trace_id":"d9141fa794234bdc89ee826fe9e643e3-0003","message_id":"response-0003","attempt":0,"ts_unix_us":"1792468311374829"}

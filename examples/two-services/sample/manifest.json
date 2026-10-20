@@ -1,0 +1,71 @@
+{
+  "schema": "chronolens.two-services.capture.v1",
+  "run_id": "d9141fa794234bdc89ee826fe9e643e3",
+  "transport": "TCP over 127.0.0.1",
+  "same_host": true,
+  "independent_process_ids": {
+    "A": 50152,
+    "B": 53924
+  },
+  "requests": 3,
+  "events": 12,
+  "messages": 6,
+  "requested_processing_ms": 10,
+  "clock_source": "time.time_ns() // 1000",
+  "raw_capture_has_injected_offset": false,
+  "b_timestamp_shift_us": "-120000",
+  "known_injected_model_offset_b_us": "120000",
+  "sha256": {
+    "service-a.raw.jsonl": "e4f25e7d4b48a8e4065fc09c16aab2b3da365a4e2b94ef2267e5f3c2e76355c7",
+    "service-b.raw.jsonl": "6b64d9e4a8349eba1819bd5d1d17a6615f920588052663f4e94aa4307379b693",
+    "events.original.jsonl": "cd3129a2ea7bb8d2d901df458e239238bcf629e87f905c098779b5fecf424260",
+    "events.shifted.jsonl": "a81d468008fa151808e2386b337e6d959f30dd9c60e4b5b7cbc34fa39fc5e69f"
+  },
+  "analysis": {
+    "original": {
+      "summary": {
+        "records": "12",
+        "pairs": "6",
+        "clocks": "2",
+        "components": "1"
+      },
+      "clocks": {
+        "A": {
+          "lower_us": "0",
+          "upper_us": "0",
+          "representative_us": "0"
+        },
+        "B": {
+          "lower_us": "-69",
+          "upper_us": "109",
+          "representative_us": "0"
+        }
+      }
+    },
+    "shifted": {
+      "summary": {
+        "records": "12",
+        "pairs": "6",
+        "clocks": "2",
+        "components": "1"
+      },
+      "clocks": {
+        "A": {
+          "lower_us": "0",
+          "upper_us": "0",
+          "representative_us": "0"
+        },
+        "B": {
+          "lower_us": "119931",
+          "upper_us": "120109",
+          "representative_us": "119931"
+        }
+      }
+    },
+    "checks": {
+      "same_host_zero_is_feasible": true,
+      "known_injected_offset_is_feasible": true,
+      "bounds_translate_exactly": true
+    }
+  }
+}

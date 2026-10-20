@@ -1,0 +1,12 @@
+import {
+  "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/correlate",
+  "Mitsuha11zz/chronolens/constraints",
+  "Mitsuha11zz/chronolens/solver",
+  "moonbitlang/core/env",
+  "moonbitlang/core/debug",
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")

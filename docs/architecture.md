@@ -13,6 +13,7 @@ model、input、correlate、constraints 及 solver 的可行性、区间与分�
 | report | JSON／Markdown 与演示数据 | model |
 | cmd/chronolens | 参数、文件 IO 与退出码 | 根包、report |
 | demo | 浏览器中的结果与证据展示 | 经验证的核心后端或结果适配层 |
+| examples/two-services | Python 标准库采集本机双进程 TCP 记录，转换后由 native 样例入口调用核心分析 | input、correlate、constraints、solver、core/env |
 
 `model/` 是公开包，用户需要构造、匹配或调用方法的公共类型由该包持有。后续增加内部扫描器等辅助包时，不将公共具体类型迁入 `internal/`。
 

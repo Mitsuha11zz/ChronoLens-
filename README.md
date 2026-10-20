@@ -19,6 +19,7 @@ chronolens/
 ├── report/                  JSON／Markdown 报告与展示数据
 ├── cmd/chronolens/           CLI 占位入口
 ├── demo/                    后续交互演示
+├── examples/two-services/    本机双进程 TCP 采集、输入转换与核心分析样例
 ├── fixtures/                后续输入与预期结果样例
 ├── docs/
 │   ├── 开发方案.md           已确认选题的完整方案
@@ -47,10 +48,21 @@ CLI 当前仅说明项目处于骨架阶段，不执行日志诊断。
 
 ## 核心验证
 
-2026-10-18：全项目 wasm、wasm-gc、js、native 各通过 111/111 测试，包括 384 个小图的独立 Floyd–Warshall 对照及 1,140 组任意精度算术边界对照。四事件区间、负环、单侧无界和独立分量样例已通过核心流水线测试，详情见 [核心验证记录](docs/core-validation.md)。当前仍未验证真实双服务采集、诊断 CLI 或生产容量。
+2026-10-18：全项目 wasm、wasm-gc、js、native 各通过 111/111 测试，包括 384 个小图的独立 Floyd–Warshall 对照及 1,140 组任意精度算术边界对照。四事件区间、负环、单侧无界和独立分量样例已通过核心流水线测试，详情见 [核心验证记录](docs/core-validation.md)。该次验证未覆盖网络采集、诊断 CLI 或生产容量。
+
+## 实际采集样例
+
+[双进程样例](examples/two-services/README.md) 通过本机 TCP 实际采集发送／接收记录，转换成 JSONL，再由 MoonBit 核心分析。2026-10-20 已采集 3 次请求／响应、12 条事件；原始 B 偏移区间为 [-69,109] 微秒，B 时间戳减去 120000 微秒后，区间为 [119931,120109] 微秒。原始记录、注入副本和分析输出分别归档；这是同机双进程演示，不是多机器校时验证。
+
+```text
+python examples/two-services/run.py --analyze
+python examples/two-services/run.py --replay examples/two-services/sample
+```
+
+正式诊断 CLI、报告导出和生产容量仍待后续实现或验证。
 
 ## 分阶段开发约定
 
 先完成目录骨架，再逐个实现功能。每个功能完成后汇报变更、验证结果与待确认事项，停止并等待用户确认。推送需获得用户明确授权。
 
-偏移区间、分量分析与核心验证已完成，等待用户确认。下一步拟补充真实双服务采集与格式转换样例，再继续报告与 CLI，详见 [进度记录](docs/progress.md)。
+双进程实际采集与格式转换样例已完成，等待用户确认。下一步拟实现结构化 JSON 诊断报告，再继续 Markdown 报告与 CLI，详见 [进度记录](docs/progress.md)。
