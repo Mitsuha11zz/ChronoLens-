@@ -1,6 +1,6 @@
-# JSON 报告导出例程
+# 诊断报告导出例程
 
-该例程从环境变量接收 JSONL，调用输入、配对、约束构建、分量求解和 report 包，向标准输出写入诊断 JSON。正式的文件分析 CLI 留到后续阶段。
+该例程从环境变量接收 JSONL，调用输入、配对、约束构建、分量求解和 report 包，向标准输出写入诊断 JSON 或 Markdown。正式的文件分析 CLI 留到后续阶段。
 
 从仓库根目录运行（PowerShell）：
 
@@ -9,9 +9,17 @@ $env:CHRONOLENS_REPORT_INPUT = Get-Content -Raw fixtures/four-events.jsonl
 moon run examples/json-report --target native
 ~~~
 
+默认输出格式是带缩进的 JSON。设置格式变量可输出 Markdown：
+
+~~~powershell
+$env:CHRONOLENS_REPORT_FORMAT = "markdown"
+moon run examples/json-report --target native
+Remove-Item Env:CHRONOLENS_REPORT_FORMAT
+~~~
+
 示例的解析来源名固定为 report-example.jsonl；事件中已有的 source 保持原值。使用命令行环境桥传入的数据应保持小规模，避免操作系统环境变量长度限制。
 
-## 已生成的输出
+## 已生成的 JSON 输出
 
 | 输出文件 | 输入来源 | 实际 status |
 | --- | --- | --- |
@@ -28,4 +36,4 @@ feasible.json 中 B 的区间为 [100000,160000] 微秒。mixed.json 同时保�
 
 local-capture.json 中 B 的区间为 [119931,120109] 微秒。它使用上阶段归档的已注入数据，注入说明仍保存在双进程样例的 manifest.json；JSON 报告不会凭事件自行推断注入历史。
 
-结构与 API 契约见 [report/README.md](../../report/README.md)。本阶段只完成 JSON 导出；Markdown 和正式 CLI 尚未实现。没有新增或运行测试套件，也没有使用 Schema 验证器执行实例验证。
+结构与 API 契约见 [report/README.md](../../report/README.md)。JSON 示例使用 native 例程生成；Markdown 可按上面的环境变量命令即时输出。本阶段未新增或运行测试套件。

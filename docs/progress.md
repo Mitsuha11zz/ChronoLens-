@@ -150,9 +150,17 @@ Python 语法编译、moon info、新样例包的 moon fmt、moon check --target
 
 2026-10-20：用户明确授权本阶段提交和推送，范围为 JSON 诊断报告实现、v1 Schema、native 导出例程、6 份示例报告及相关文档；提交与推送结果以 Git 记录为准。下一功能仍等待用户另行确认开始。
 
-## 下一功能：Markdown 诊断报告（待用户确认开始）
+## 2026-10-21：Markdown 诊断报告
 
-将相同诊断源渲染为便于阅读的摘要、分量区间、输入／关联问题和冲突证据，保持与 JSON 的状态和不确定性语义一致。随后单独实现正式文件分析 CLI。
+在已有 JSON 诊断数据上增加人类可读的 Markdown 展示，覆盖整体状态、输入与关联质量、事件、分量偏移区间、负环约束和错误证据；与 JSON 保持同一状态和不确定性语义。
+
+已添加 `DiagnosticReport::to_markdown()`。报告展示解析诊断、配对／未解决消息、模型先验、事件来源、分量统计、代表偏移与边际区间；负环按全局原始约束索引呈现不等式、边方向、消息／先验证据和总权重。无界上下界、非 UTC 参考坐标、边际端点语义、输入预览、未知完整性以及“冲突不等于根因”均有明确说明。动态值转义后置于 HTML code span，避免字段内容破坏表格结构。
+
+导出例程已支持通过 `CHRONOLENS_REPORT_FORMAT=markdown` 输出 Markdown，默认仍输出 JSON。已更新报告 API、项目说明和阶段记录，`moon info` 已生成包含 `to_markdown()` 的公开接口。`moon fmt report examples/json-report`、`moon check --target all --deny-warn` 和 `git diff --check` 已通过；本阶段未新增或运行测试套件，也未运行示例。未提交、未推送，完成后停止等待用户确认。
+
+## 下一功能：正式文件分析 CLI（待用户确认开始）
+
+将 JSONL 文件读取、分析流水线、JSON／Markdown 输出与资源限制接入正式命令行入口，并明确命令参数、退出状态和错误输出。保持 CLI 独立于环境变量示例。
 
 ## 后续功能顺序
 

@@ -28,5 +28,8 @@ fn main {
   let diagnostic = describe(text) catch {
     error => abort("report construction failed: " + @debug.to_string(error))
   }
-  println(diagnostic.stringify(pretty=true))
+  match @env.get_env_var("CHRONOLENS_REPORT_FORMAT") {
+    Some("markdown") => println(diagnostic.to_markdown())
+    _ => println(diagnostic.stringify(pretty=true))
+  }
 }

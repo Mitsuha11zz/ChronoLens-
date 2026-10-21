@@ -1,6 +1,6 @@
 # JSON 诊断报告
 
-提供 schema_version 为 chronolens.diagnostic.v1 的核心诊断导出。只负责把已有输入诊断或求解结果转换为 JSON，不进行文件 IO、重新求解或 Markdown 渲染。
+提供 schema_version 为 chronolens.diagnostic.v1 的核心诊断导出，并将同一份诊断渲染为 Markdown。报告包只呈现已有输入诊断或求解结果，不进行文件 IO 或重新求解。
 
 ## 入口
 
@@ -8,6 +8,7 @@
 let diagnostic = @report.from_analysis(analysis, input=parsed)
 let value = diagnostic.to_json()
 let text = diagnostic.stringify(pretty=true)
+let markdown = diagnostic.to_markdown()
 ~~~
 
 上面的代码放在允许传播 ReportError 的函数中，analysis 为 solver.AnalysisReport，parsed 为 input.InputReport。
@@ -19,6 +20,7 @@ let text = diagnostic.stringify(pretty=true)
 | from_failure(failure, input?) | 输出实际失败阶段与错误，保留已有解析信息 |
 | DiagnosticReport.to_json() | 返回独立的 Json 值，修改它不改变报告源数据 |
 | DiagnosticReport.stringify(pretty=false) | 按确定的对象键顺序输出文本；pretty=true 使用两空格缩进 |
+| DiagnosticReport.to_markdown() | 生成摘要、输入与关联问题、事件、偏移区间和冲突证据 |
 
 若给 from_analysis 附带 input，输入必须整份有效，事件集合及每个事件的字段、时间戳、来源都须与分析源完全相同；否则抛出 InvalidInputReport 或 MismatchedInputEvents。未附带时 input 为 null，不替调用方编造解析验证结论。
 
@@ -98,8 +100,16 @@ stringify 递归按 UTF-16 字典序输出对象键；事件表和先验表显�
 
 报告不会校验 source 路径对应的磁盘文件，也无法推断上游是否人为修改过时间戳。本机采集的注入数据仍应与其 manifest 一并保存。
 
+## Markdown 渲染
+
+`to_markdown()` 从同一份诊断数据生成报告，包含整体状态、分量统计、输入问题、消息配对覆盖、偏移先验、事件、未解决组、每个时钟分量的结果，以及阶段或分量错误。
+
+可行分量同时显示一组使用参考时钟归零的代表偏移和各时钟的边际区间；无界下界显示为 −∞，无界上界显示为 +∞。报告说明代表解不是 UTC，边际端点不保证可以共同取到。冲突分量按原始全局约束索引列出负环边、差分不等式、图边方向和消息／先验证据，并注明负环不保证是最小冲突集，也不直接确定根因。失败分量显示计算错误，不输出伪造的区间。
+
+动态事件字段以转义后的 HTML code span 呈现，表格分隔符和换行不会破坏 Markdown 表格结构。Markdown 保留 JSON 报告中的状态、关联、假设和不确定性语义；它是展示格式，不是新的数据契约，也不增加文件 IO 或输出容量限制。
+
 ## 实现与运行状态
 
-2026-10-20：moon check --target all --deny-warn 通过，公开接口已生成，新包已格式化。通过 native 导出例程实际生成了 6 份可解析的 JSON 示例，覆盖可行、多分量冲突、输入非法、计算未完成、没有约束和本机采集数据。
+2026-10-20：JSON 报告阶段通过 moon check --target all --deny-warn，公开接口已生成，报告包已格式化。通过 native 导出例程实际生成了 6 份可解析的 JSON 示例，覆盖可行、多分量冲突、输入非法、计算未完成、没有约束和本机采集数据。
 
 示例见 [examples/json-report](../examples/json-report/README.md)。本阶段未新增或运行测试套件，也未执行 JSON Schema 实例验证；Schema 不验证引用完整性、图论结论或求解正确性。原核心测试的历史结果见 docs/core-validation.md。
