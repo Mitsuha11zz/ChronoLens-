@@ -1,1 +1,22 @@
+import {
+  "Mitsuha11zz/chronolens/constraints",
+  "Mitsuha11zz/chronolens/correlate",
+  "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/report",
+  "Mitsuha11zz/chronolens/solver",
+  "moonbitlang/core/argparse",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/string",
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys",
+  "moonbitlang/x/unicode",
+}
+
+options(
+  "native-stub": [ "file_size.c" ],
+  targets: { "file_size.mbt": [ "native" ] },
+)
+
+supported_targets = "native"
+
 pkgtype(kind: "executable")

@@ -158,9 +158,19 @@ Python 语法编译、moon info、新样例包的 moon fmt、moon check --target
 
 导出例程已支持通过 `CHRONOLENS_REPORT_FORMAT=markdown` 输出 Markdown，默认仍输出 JSON。已更新报告 API、项目说明和阶段记录，`moon info` 已生成包含 `to_markdown()` 的公开接口。`moon fmt report examples/json-report`、`moon check --target all --deny-warn` 和 `git diff --check` 已通过；本阶段未新增或运行测试套件，也未运行示例。未提交、未推送，完成后停止等待用户确认。
 
-## 下一功能：正式文件分析 CLI（待用户确认开始）
+## 2026-10-21：正式文件分析 CLI
 
-将 JSONL 文件读取、分析流水线、JSON／Markdown 输出与资源限制接入正式命令行入口，并明确命令参数、退出状态和错误输出。保持 CLI 独立于环境变量示例。
+将 JSONL 文件读取、分析流水线、JSON／Markdown 输出与资源限制接入正式命令行入口，并明确命令参数、退出状态和错误输出。CLI 独立于环境变量示例。
+
+已实现 `cmd/chronolens` 正式 native 入口：解析命令行参数，读取 UTF-8 JSONL，调用输入解析、消息关联、差分约束构建、偏移分析和诊断报告；可将 JSON 或 Markdown 输出到标准输出或指定文件。已提供参考时钟、消息容差、七项输入限制和三项求解限制参数。既有输出文件默认拒绝覆盖，需显式传入 `--force`。
+
+文件大小先通过 native 文件元数据预检，再读取；读取后复核实际字节数，并严格校验 UTF-8 后才解码。输入非法时输出输入诊断；冲突返回 1，分析无冲突返回 0，参数错误、文件 IO、输入问题和不完整分析分别使用状态码 2、3、4、5。完整用法记录于 `cmd/chronolens/README.md`。
+
+已加入 `moonbitlang/x@0.5.5` 的文件与退出接口；CLI 包限定为 native target。`moon fmt cmd/chronolens`、`moon info`、`moon check --target native --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过，Windows 原生构建成功，无警告、无错误。本阶段未新增或运行测试套件，也未运行 CLI 样例；CLI 实际输出与退出码行为尚未运行时验证。未提交、未推送，完成后停止等待用户确认。
+
+## 下一功能：交互演示（待用户确认开始）
+
+提供能导入或编辑 JSONL、运行分析并交互查看分量、偏移区间与冲突证据的本地演示。保持诊断语义与 CLI、JSON、Markdown 报告一致。
 
 ## 后续功能顺序
 

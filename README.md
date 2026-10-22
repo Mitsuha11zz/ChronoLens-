@@ -2,7 +2,7 @@
 
 MoonBit 实现的分布式日志时间约束诊断库，配套离线 CLI 与交互演示。
 
-项目目标是通过明确的消息发送／接收关系，计算固定时钟偏移的可行范围，并给出时间约束冲突的证据。当前已完成目录骨架、[基础数据模型](model/README.md)、[JSONL 输入解析和校验](input/README.md)、[消息配对与关联诊断](correlate/README.md)、[差分约束构建](constraints/README.md)、[可行性与偏移区间](solver/README.md)，以及 [JSON 和 Markdown 诊断报告](report/README.md)。正式诊断 CLI 和交互演示尚未实现。
+项目目标是通过明确的消息发送／接收关系，计算固定时钟偏移的可行范围，并给出时间约束冲突的证据。当前已完成目录骨架、[基础数据模型](model/README.md)、[JSONL 输入解析和校验](input/README.md)、[消息配对与关联诊断](correlate/README.md)、[差分约束构建](constraints/README.md)、[可行性与偏移区间](solver/README.md)、[JSON 和 Markdown 诊断报告](report/README.md)，以及 [正式文件分析 CLI](cmd/chronolens/README.md)。交互演示尚未实现。
 
 ## 目录结构
 
@@ -17,7 +17,7 @@ chronolens/
 ├── constraints/             事件关系转换为差分约束
 ├── solver/                  可行性、偏移范围与负环见证
 ├── report/                  JSON／Markdown 报告与展示数据
-├── cmd/chronolens/           CLI 占位入口
+├── cmd/chronolens/           native 文件分析 CLI
 ├── demo/                    后续交互演示
 ├── examples/two-services/    本机双进程 TCP 采集、输入转换与核心分析样例
 ├── examples/json-report/     JSON 报告导出例程及已生成的示例输出
@@ -40,12 +40,12 @@ chronolens/
 
 ```text
 moon check --target all
-moon run cmd/chronolens --target native
+moon run cmd/chronolens --target native -- fixtures/four-events.jsonl
 moon info
 moon fmt
 ```
 
-CLI 当前仅说明项目处于骨架阶段，不执行日志诊断。
+CLI 从 JSONL 文件读取事件，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。
 
 ## 核心验证
 
@@ -60,7 +60,7 @@ python examples/two-services/run.py --analyze
 python examples/two-services/run.py --replay examples/two-services/sample
 ```
 
-正式诊断 CLI 和生产容量仍待后续实现或验证。
+生产容量、多机器时钟表现和交互演示仍待后续实现或验证。
 
 ## 诊断报告
 
@@ -72,4 +72,4 @@ report 包提供 from_input、from_analysis 和 from_failure，保留输入诊�
 
 先完成目录骨架，再逐个实现功能。每个功能完成后汇报变更、验证结果与待确认事项，停止并等待用户确认。推送需获得用户明确授权。
 
-结构化 JSON 与 Markdown 诊断报告已完成，等待用户确认。下一步拟实现正式诊断 CLI，详见 [进度记录](docs/progress.md)。
+正式 CLI 已完成，等待用户确认。下一步拟实现交互演示，详见 [进度记录](docs/progress.md)。

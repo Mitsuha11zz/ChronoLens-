@@ -24,3 +24,7 @@ keywords = [ "clock-offset", "log-analysis", "difference-constraints" ]
 preferred_target = "native"
 
 description = "Offline clock-offset constraint diagnosis for distributed logs."
+
+import {
+  "moonbitlang/x@0.5.5",
+}
