@@ -1,8 +1,8 @@
 # ChronoLens
 
-MoonBit 实现的分布式日志时间约束诊断库，配套离线 CLI 与交互演示。
+MoonBit 实现的分布式日志时间约束诊断库，配套离线 CLI 与本地交互演示。
 
-项目目标是通过明确的消息发送／接收关系，计算固定时钟偏移的可行范围，并给出时间约束冲突的证据。当前已完成目录骨架、[基础数据模型](model/README.md)、[JSONL 输入解析和校验](input/README.md)、[消息配对与关联诊断](correlate/README.md)、[差分约束构建](constraints/README.md)、[可行性与偏移区间](solver/README.md)、[JSON 和 Markdown 诊断报告](report/README.md)，以及 [正式文件分析 CLI](cmd/chronolens/README.md)。交互演示尚未实现。
+项目目标是通过明确的消息发送／接收关系，计算固定时钟偏移的可行范围，并给出时间约束冲突的证据。当前已完成目录骨架、[基础数据模型](model/README.md)、[JSONL 输入解析和校验](input/README.md)、[消息配对与关联诊断](correlate/README.md)、[差分约束构建](constraints/README.md)、[可行性与偏移区间](solver/README.md)、[JSON 和 Markdown 诊断报告](report/README.md)、[正式文件分析 CLI](cmd/chronolens/README.md)以及[本地交互演示](demo/README.md)。
 
 ## 目录结构
 
@@ -18,8 +18,9 @@ chronolens/
 ├── solver/                  可行性、偏移范围与负环见证
 ├── report/                  JSON／Markdown 报告与展示数据
 ├── cmd/chronolens/           native 文件分析 CLI
-├── demo/                    后续交互演示
+├── demo/                    本机浏览器工作台与 CLI 请求桥接
 ├── examples/two-services/    本机双进程 TCP 采集、输入转换与核心分析样例
+├── examples/otel-rpc/        OTLP JSON RPC Span 转 ChronoLens JSONL
 ├── examples/json-report/     JSON 报告导出例程及已生成的示例输出
 ├── fixtures/                后续输入与预期结果样例
 ├── docs/
@@ -32,7 +33,7 @@ chronolens/
 └── LICENSE                  Apache-2.0
 ```
 
-目录中的 `moon.pkg` 按功能实现加入具体依赖。`demo/` 目前只有范围说明；`fixtures/` 已包含四事件、混合关联、负环冲突及多分量输入样例。
+目录中的 `moon.pkg` 按功能实现加入具体依赖。`demo/` 使用 Python 标准库提供本地页面并转发到 MoonBit native CLI；`fixtures/` 包含四事件、混合关联、负环冲突及多分量输入样例。
 
 ## 开发与检查
 
@@ -45,7 +46,17 @@ moon info
 moon fmt
 ```
 
-CLI 从 JSONL 文件读取事件，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。
+CLI 从 JSONL 文件读取事件，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。启动浏览器演示：
+
+```text
+python demo/server.py
+```
+
+服务只监听 `127.0.0.1:8765`，启动时构建 native CLI。演示说明和模型边界见 [demo 文档](demo/README.md)。
+
+## OpenTelemetry RPC 数据
+
+`examples/otel-rpc/` 提供一个标准库转换器，将 OTLP JSON trace 导出的 RPC CLIENT/SERVER Span 起始关系转换为 JSONL，再交由同一 MoonBit CLI 分析。转换语义、时钟域选择和限制见 [适配器文档](examples/otel-rpc/README.md)。
 
 ## 核心验证
 
@@ -60,7 +71,7 @@ python examples/two-services/run.py --analyze
 python examples/two-services/run.py --replay examples/two-services/sample
 ```
 
-生产容量、多机器时钟表现和交互演示仍待后续实现或验证。
+生产容量和多机器时钟表现仍待验证；本地交互演示与限定范围的 OpenTelemetry RPC 适配器已完成。
 
 ## 诊断报告
 
@@ -72,4 +83,4 @@ report 包提供 from_input、from_analysis 和 from_failure，保留输入诊�
 
 先完成目录骨架，再逐个实现功能。每个功能完成后汇报变更、验证结果与待确认事项，停止并等待用户确认。推送需获得用户明确授权。
 
-正式 CLI 已完成，等待用户确认。下一步拟实现交互演示，详见 [进度记录](docs/progress.md)。
+正式 CLI、本地交互演示与 OpenTelemetry RPC 适配器已完成，当前功能等待用户确认后再进入下一阶段，详见 [进度记录](docs/progress.md)。

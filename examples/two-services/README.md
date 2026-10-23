@@ -33,7 +33,7 @@ python examples/two-services/run.py --analyze
 python examples/two-services/run.py --replay examples/two-services/sample
 ~~~
 
-分析样例通过有长度上限的环境变量传递 JSONL 给 MoonBit native 入口，不生成代码文件。数据过大时要求减少请求数；这是当前样例的数据桥接方式，正式的文件分析 CLI 留到后续阶段。
+分析样例通过有长度上限的环境变量传递 JSONL 给 MoonBit native 入口，不生成代码文件。数据过大时要求减少请求数；这是当前采集脚本样例的数据桥接方式。正式文件分析请使用 [ChronoLens CLI](../../cmd/chronolens/README.md)。
 
 ## 2. 采集内容
 
@@ -96,4 +96,4 @@ python examples/two-services/convert.py --raw-a examples/two-services/sample/ser
 
 ## 6. 后续范围
 
-正式 JSON／Markdown 诊断报告、支持文件读取的 chronolens analyze 命令、多机器采集和其他真实日志适配，分别留到后续确认的功能。
+正式 JSON／Markdown 诊断报告与文件分析 CLI 已提供。多机器采集仍未验证；OpenTelemetry RPC trace 转换见[适配器文档](../otel-rpc/README.md)，其它真实日志格式需按其事件语义另行设计适配器。

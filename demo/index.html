@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#11130f">
+    <title>ChronoLens · 时钟关系诊断台</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="site-grain" aria-hidden="true"></div>
+    <div class="page-shell">
+      <header class="masthead">
+        <a class="brand" href="/" aria-label="ChronoLens 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="1.4" />
+              <circle cx="20" cy="20" r="3" fill="currentColor" />
+              <path d="M20 6v8m14 6h-8M20 34v-8M6 20h8" stroke="currentColor" stroke-width="1.4" />
+              <path d="M20 20 29 11" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+          </span>
+          <span class="brand-word">Chrono<span>Lens</span></span>
+        </a>
+        <div class="masthead-meta">
+          <span class="local-indicator"><i></i> LOCAL ANALYSIS</span>
+          <span class="edition">DIAGNOSTIC FIELD / 01</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <div class="hero-copy">
+            <p class="kicker"><span>时间关系实验室</span><span class="kicker-rule"></span><span>LOG / OFFSET / EVIDENCE</span></p>
+            <h1 id="page-title">时钟关系，<em>有据可循。</em></h1>
+            <p class="hero-intro">
+              从明确的消息往返中推导时钟偏移范围。每条结论都能回到原始事件、约束边和冲突见证。
+            </p>
+          </div>
+          <div class="hero-instrument" aria-hidden="true">
+            <div class="orbit orbit-a"></div>
+            <div class="orbit orbit-b"></div>
+            <div class="orbit orbit-c"></div>
+            <span class="instrument-cross cross-h"></span>
+            <span class="instrument-cross cross-v"></span>
+            <span class="instrument-dot"></span>
+            <span class="instrument-label label-top">CLOCK OFFSET</span>
+            <span class="instrument-label label-bottom">Δt · µs</span>
+          </div>
+        </section>
+
+        <section class="workbench" aria-label="ChronoLens 分析工作区">
+          <aside class="source-panel panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-index">01 <i></i> SOURCE</span>
+                <h2>载入事件流</h2>
+              </div>
+              <span class="format-stamp">JSONL</span>
+            </div>
+
+            <div class="sample-row">
+              <label for="sample-select">从样例开始</label>
+              <select id="sample-select" aria-label="选择内置样例">
+                <option value="four-events">四事件 · 可行区间</option>
+                <option value="negative-cycle">负环 · 时间冲突</option>
+                <option value="mixed-associations">关联缺口 · 缺失与歧义</option>
+                <option value="component-analysis">多分量 · 独立坐标</option>
+              </select>
+            </div>
+
+            <label class="dropzone" id="dropzone" for="file-input">
+              <input id="file-input" type="file" accept=".jsonl,.json,.txt,application/json">
+              <span class="drop-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M4 14.5v4A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="drop-copy"><strong>拖入 JSONL 文件</strong><small>或点击选择本地文件</small></span>
+              <span class="drop-limit">≤ 8 MiB</span>
+            </label>
+
+            <div class="editor-head">
+              <label for="jsonl-input">事件文本</label>
+              <span id="line-count">0 行</span>
+            </div>
+            <textarea id="jsonl-input" spellcheck="false" autocomplete="off" autocapitalize="off" aria-describedby="input-note" placeholder="每行一条 JSON 事件记录"></textarea>
+            <p class="editor-note" id="input-note"><span class="note-led"></span><span id="source-name">等待输入 · UTF-8</span><span>时间单位 µs</span></p>
+
+            <div class="assumptions">
+              <div class="subheading"><span>02 <i></i> ASSUMPTIONS</span><span class="quiet-label">可选</span></div>
+              <div class="settings-grid">
+                <label class="setting-field">
+                  <span>关系容差 <small>µs</small></span>
+                  <input id="tolerance-input" type="number" min="0" step="1" value="0" inputmode="numeric">
+                </label>
+                <label class="setting-field">
+                  <span>参考时钟 <small>可留空</small></span>
+                  <input id="reference-input" type="text" maxlength="4096" placeholder="自动选择">
+                </label>
+              </div>
+              <p class="assumption-note">固定偏移模型 · 无先验时不补造约束</p>
+            </div>
+
+            <button class="analyze-button" id="analyze-button" type="button">
+              <span class="button-glyph" aria-hidden="true">↗</span>
+              <span class="button-label">运行约束分析</span>
+              <span class="button-key">⌘ / CTRL ↵</span>
+            </button>
+            <p class="privacy-note"><span aria-hidden="true">◉</span> 文件与分析都留在本机，不会上传到云端。</p>
+          </aside>
+
+          <section class="results-panel" aria-label="分析结果">
+            <div class="results-topline">
+              <span class="section-index">03 <i></i> READOUT</span>
+              <button class="export-button" id="export-button" type="button" disabled>
+                <span aria-hidden="true">↓</span> 导出 JSON
+              </button>
+            </div>
+
+            <div class="empty-state" id="empty-state">
+              <div class="empty-art" aria-hidden="true">
+                <span class="empty-ring ring-one"></span>
+                <span class="empty-ring ring-two"></span>
+                <span class="empty-ring ring-three"></span>
+                <span class="empty-center">CL</span>
+                <span class="empty-axis axis-x"></span>
+                <span class="empty-axis axis-y"></span>
+                <span class="empty-point point-a"></span>
+                <span class="empty-point point-b"></span>
+              </div>
+              <p class="empty-index">NO ANALYSIS / READY</p>
+              <h2>等待一组约束。</h2>
+              <p class="empty-copy">载入内置样例或粘贴事件日志，开始查看时钟之间能够成立的关系。</p>
+              <div class="empty-foot"><span>01 — INPUT</span><span>02 — SOLVE</span><span>03 — INSPECT</span></div>
+            </div>
+
+            <div class="report-view" id="report-view" hidden>
+              <section class="verdict" id="verdict" aria-live="polite">
+                <div class="verdict-main">
+                  <span class="verdict-eyebrow" id="verdict-eyebrow">ANALYSIS COMPLETE</span>
+                  <h2 id="verdict-title">—</h2>
+                  <p id="verdict-copy">—</p>
+                </div>
+                <div class="verdict-mark" id="verdict-mark" aria-hidden="true">✓</div>
+              </section>
+
+              <div class="metric-strip" id="metric-strip"></div>
+
+              <section class="result-section">
+                <div class="result-heading">
+                  <div><span class="section-index">04 <i></i> COMPONENTS</span><h3>偏移可行范围</h3></div>
+                  <span class="heading-side-note">分量使用独立参考坐标</span>
+                </div>
+                <div class="component-grid" id="component-grid"></div>
+              </section>
+
+              <section class="result-section timeline-section">
+                <div class="result-heading">
+                  <div><span class="section-index">05 <i></i> REPRESENTATIVE</span><h3>一组代表时间线</h3></div>
+                  <span class="heading-side-note">不是 UTC · 分量间不可比较</span>
+                </div>
+                <p class="section-explainer">使用求解器返回的同一组可行偏移，将事件放入各自分量的参考坐标。横向位置只在同一分量内有意义。</p>
+                <div class="timeline-stack" id="timeline-stack"></div>
+              </section>
+
+              <section class="result-section evidence-section">
+                <div class="result-heading">
+                  <div><span class="section-index">06 <i></i> WITNESS</span><h3>冲突证据</h3></div>
+                  <span class="heading-side-note">点击事件可查看原始记录</span>
+                </div>
+                <div class="evidence-list" id="evidence-list"></div>
+              </section>
+
+              <section class="result-section event-section">
+                <div class="result-heading">
+                  <div><span class="section-index">07 <i></i> EVENTS</span><h3>原始事件</h3></div>
+                  <span class="heading-side-note">按时钟分组 · 保留输入观测值</span>
+                </div>
+                <div class="event-inspector" id="event-inspector">
+                  <span class="inspector-placeholder">选择一条事件或证据查看字段</span>
+                </div>
+                <div class="event-list" id="event-list"></div>
+              </section>
+
+              <details class="raw-report">
+                <summary><span>原始诊断 JSON</span><span>VIEW / V1</span></summary>
+                <pre id="raw-json"></pre>
+              </details>
+              <p class="model-footnote">偏移范围依赖固定偏移与输入关联假设。区间端点分别计算，不保证能同时取到；负环是冲突见证，不自动给出根因。</p>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <footer class="page-footer">
+        <span>CHRONOLENS <i>·</i> MOONBIT CLOCK CONSTRAINTS</span>
+        <span>LOCAL FIRST <i>·</i> EVIDENCE OVER GUESSES</span>
+      </footer>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -168,9 +168,33 @@ Python 语法编译、moon info、新样例包的 moon fmt、moon check --target
 
 已加入 `moonbitlang/x@0.5.5` 的文件与退出接口；CLI 包限定为 native target。`moon fmt cmd/chronolens`、`moon info`、`moon check --target native --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过，Windows 原生构建成功，无警告、无错误。本阶段未新增或运行测试套件，也未运行 CLI 样例；CLI 实际输出与退出码行为尚未运行时验证。未提交、未推送，完成后停止等待用户确认。
 
-## 下一功能：交互演示（待用户确认开始）
+阶段 7 已推送并核对远程与本地一致：`9ea30e12b4949b7a019516bdf80e1d549e2147d5`。
 
-提供能导入或编辑 JSONL、运行分析并交互查看分量、偏移区间与冲突证据的本地演示。保持诊断语义与 CLI、JSON、Markdown 报告一致。
+## 2026-10-22：本地交互演示
+
+提供能导入或编辑 JSONL、调用正式 MoonBit CLI 分析并交互查看分量、偏移区间与冲突证据的本地浏览器工作台。保持诊断语义与 CLI、JSON、Markdown 报告一致。
+
+新增 `demo/server.py`，使用 Python 标准库仅监听 `127.0.0.1:8765`；启动时构建 native CLI，每次分析将输入写入临时目录并调用正式 CLI，结束后清理。静态页面没有外部依赖，分析逻辑没有在浏览器端重写。
+
+页面支持四份内置样例、本地 JSONL 文件／拖放／编辑、关系容差与参考时钟设置、摘要指标、分量偏移边际区间和代表解、代表时间线、负环约束与可点选事件证据、原始事件字段检查及完整 JSON 报告导出。超过 160 条的分量时间线均匀抽样显示，原始诊断和导出仍保留完整报告。
+
+时间线明确使用每个分量自己的代表坐标，不标为 UTC，也不横向比较分量；报告说明区间端点不可保证同时取到，负环不是根因判定。服务限制单次输入 8 MiB、分析超时 120 秒，适用于本地试用，不代表生产 Web 服务。
+
+验证：`moon build cmd/chronolens --target native --deny-warn`、`python -m py_compile demo/server.py`、`node --check demo/app.js` 和 `git diff --check` 均通过；native CLI 构建无警告、无错误。本阶段未新增或运行测试套件，也未启动浏览器演示做交互验证。当前工作未提交、未推送，完成后停止等待用户确认。
+
+## 2026-10-22：OpenTelemetry RPC trace 适配器
+
+按首版 P1 范围增加一个有明确语义边界的真实数据格式转换器：读取 OTLP JSON trace 导出，将可识别的 RPC 调用起始关系转换为既有 ChronoLens JSONL，再使用同一个 CLI 与交互演示分析。
+
+新增 `examples/otel-rpc/convert.py` 和 OTLP JSON 样例。转换器识别数字枚举 `kind=3` 的 CLIENT 与 `kind=2` 的 SERVER spans；仅在 Trace ID 相同、SERVER `parentSpanId` 指向 CLIENT `spanId` 时配对。CLIENT 起始时间映射为发送事件，SERVER 起始时间映射为接收事件；没有把整个父子 Span 区间强行当作报文先后关系。纳秒时间戳向下转换为微秒，事件与消息标识保留原 Trace/Span ID。
+
+缺失端保持为单边事件，多 SERVER 子 Span 保留为关联歧义，其他 SpanKind 计数后忽略。默认时钟标识使用 `service.instance.id` 并组合 service 名称；可通过 `--clock-attribute` 选择宿主机或其它明确代表时钟域的资源属性。转换器拒绝重复 JSON 键、重复 Span 身份、无效时间戳与缺少时钟标识的 RPC span，并遵守 ChronoLens 默认输入、事件和时钟域限制。
+
+OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/SERVER 生命周期依据 RPC span conventions。适配语义和限制记录于 `examples/otel-rpc/README.md`。`python -m py_compile examples/otel-rpc/convert.py`、`python -m json.tool examples/otel-rpc/sample-traces.json` 和 `git diff --check` 通过。本阶段未执行转换器样例，也未新增或运行测试套件。未提交、未推送，完成后停止等待用户确认。
+
+## 下一阶段（待用户确认）
+
+可推进容量测量或交付整理，目前尚未开始。
 
 ## 后续功能顺序
 
@@ -181,6 +205,6 @@ Python 语法编译、moon info、新样例包的 moon fmt、moon check --target
 5. 可行性与负环见证。
 6. 偏移区间与分量分析。
 7. 报告与 CLI。
-8. 交互演示与交付整理。
+8. 交互演示（已完成）；后续交付整理另行确认。
 
 每次只推进一个确认过的功能，完成后停止等待确认。没有推送授权时不执行 `git push`。

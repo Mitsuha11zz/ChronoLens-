@@ -1,6 +1,6 @@
 # 诊断报告导出例程
 
-该例程从环境变量接收 JSONL，调用输入、配对、约束构建、分量求解和 report 包，向标准输出写入诊断 JSON 或 Markdown。正式的文件分析 CLI 留到后续阶段。
+该例程从环境变量接收 JSONL，调用输入、配对、约束构建、分量求解和 report 包，向标准输出写入诊断 JSON 或 Markdown。处理文件时请使用[正式分析 CLI](../../cmd/chronolens/README.md)。
 
 从仓库根目录运行（PowerShell）：
 

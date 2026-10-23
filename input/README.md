@@ -6,7 +6,7 @@
 
 `parse_jsonl(text, source_path?, limits?)` 返回 `InputReport`。调用方导入 `Mitsuha11zz/chronolens/input`，使用别名 `input`。
 
-入口接收已读入内存的 String；文件读取、字节流解码和 CLI 分析命令在后续适配阶段实现。默认来源路径为 `<memory>`。
+入口接收已读入内存的 String；文件读取和字节流解码由 `cmd/chronolens` 完成，不属于 input 包。默认来源路径为 `<memory>`。
 
 | 结果成员 | 契约 |
 | --- | --- |
