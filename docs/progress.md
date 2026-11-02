@@ -238,3 +238,5 @@ OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/S
 新增 `.github/workflows/ci.yml`，在 `push`、`pull_request` 和手动触发时执行。工作流安装 MoonBit 与 Python 3.13，刷新 MoonBit 包索引，然后依次运行所有支持后端的 `moon check`、`moon test`，构建 native CLI，检查 Python／JavaScript 语法并执行集成回归。权限仅授予 `contents: read`。
 
 本地验证结果：工作流 YAML 结构检查通过；`moon check --target all --deny-warn` 无警告错误；`moon test --target all --deny-warn` 在 wasm、wasm-gc、js、native 各通过 111/111；native CLI 构建、4 个 Python 文件语法检查、前端 JavaScript 语法检查和 2 项端到端回归均通过。GitHub 托管 runner 上的首次工作流运行需在推送后确认。当前改动未提交、未推送，完成后停止等待用户确认。
+
+首次 GitHub Actions 运行在集成测试启动阶段失败：MoonBit native 构建成功，但测试入口按操作系统和固定 debug 路径查找 CLI，未在 runner 上的预期位置找到产物。现已将构建与定位统一到 `demo.server`，同时查找 `chronolens.exe`／`chronolens` 及 debug／release 目录；集成测试新增路径变体回归。本地 3 项集成回归全部通过；GitHub 托管 runner 结果需推送后复验，尚未确认 Linux runner 结果。

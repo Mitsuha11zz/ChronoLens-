@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import platform
-import shutil
 import statistics
 import subprocess
 import sys
@@ -18,6 +16,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MESSAGES = (100, 1_000, 5_000)
 MAX_MESSAGES = 5_000
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from demo.server import build_engine  # noqa: E402
 
 
 def parse_messages(value: str) -> tuple[int, ...]:
@@ -35,32 +38,6 @@ def parse_messages(value: str) -> tuple[int, ...]:
     if len(set(messages)) != len(messages):
         raise argparse.ArgumentTypeError("消息规模不能重复。")
     return messages
-
-
-def build_engine() -> Path:
-    moon = shutil.which("moon")
-    if moon is None:
-        raise RuntimeError("找不到 MoonBit 工具链 moon，请先安装并加入 PATH。")
-
-    completed = subprocess.run(
-        [moon, "build", "cmd/chronolens", "--target", "native", "--deny-warn"],
-        cwd=ROOT,
-        check=False,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    if completed.returncode != 0:
-        detail = completed.stderr.strip() or completed.stdout.strip()
-        raise RuntimeError(detail or f"MoonBit 构建退出码为 {completed.returncode}。")
-    executable = "chronolens.exe" if os.name == "nt" else "chronolens"
-    engine = (
-        ROOT / "_build" / "native" / "debug" / "build" / "cmd" / "chronolens" / executable
-    )
-    if not engine.is_file():
-        raise RuntimeError("MoonBit 构建完成，但没有找到 native CLI 可执行文件。")
-    return engine
 
 
 def write_workload(path: Path, message_count: int) -> int:

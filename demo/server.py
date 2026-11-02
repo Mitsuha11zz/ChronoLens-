@@ -43,8 +43,15 @@ STATIC_FILES = {
 
 
 def engine_path() -> Path:
-    executable = "chronolens.exe" if os.name == "nt" else "chronolens"
-    return ROOT / "_build" / "native" / "debug" / "build" / "cmd" / "chronolens" / executable
+    for profile in ("debug", "release"):
+        package_dir = (
+            ROOT / "_build" / "native" / profile / "build" / "cmd" / "chronolens"
+        )
+        for executable in ("chronolens.exe", "chronolens"):
+            candidate = package_dir / executable
+            if candidate.is_file():
+                return candidate
+    raise RuntimeError("MoonBit native CLI binary was not found under _build/native.")
 
 
 def build_engine() -> Path:
@@ -57,10 +64,7 @@ def build_engine() -> Path:
         cwd=ROOT,
         check=True,
     )
-    executable = engine_path()
-    if not executable.is_file():
-        raise RuntimeError("MoonBit 构建完成，但没有找到 native CLI 可执行文件。")
-    return executable
+    return engine_path()
 
 
 ENGINE: Path | None = None

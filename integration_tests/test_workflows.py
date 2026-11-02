@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -12,20 +10,11 @@ import threading
 import unittest
 from http.server import ThreadingHTTPServer
 from pathlib import Path
+from unittest.mock import patch
 from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ENGINE = (
-    ROOT
-    / "_build"
-    / "native"
-    / "debug"
-    / "build"
-    / "cmd"
-    / "chronolens"
-    / ("chronolens.exe" if os.name == "nt" else "chronolens")
-)
 CONVERTER = ROOT / "examples" / "otel-rpc" / "convert.py"
 OTLP_SAMPLE = ROOT / "examples" / "otel-rpc" / "sample-traces.json"
 
@@ -33,28 +22,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from demo import server as demo_server  # noqa: E402
-
-
-def build_engine() -> Path:
-    moon = shutil.which("moon")
-    if moon is None:
-        raise RuntimeError("MoonBit 工具链 moon 必须已安装并加入 PATH。")
-
-    completed = subprocess.run(
-        [moon, "build", "cmd/chronolens", "--target", "native", "--deny-warn"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=False,
-    )
-    if completed.returncode != 0:
-        detail = completed.stderr.strip() or completed.stdout.strip()
-        raise RuntimeError(detail or f"MoonBit 构建退出码为 {completed.returncode}。")
-    if not ENGINE.is_file():
-        raise RuntimeError("MoonBit 构建完成，但没有找到 native CLI 可执行文件。")
-    return ENGINE
 
 
 class QuietDemoHandler(demo_server.Handler):
@@ -65,7 +32,30 @@ class QuietDemoHandler(demo_server.Handler):
 class WorkflowIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.engine = build_engine()
+        cls.engine = demo_server.build_engine()
+
+    def test_engine_path_supports_artifact_name_and_profile_variants(self) -> None:
+        for profile, executable in (
+            ("debug", "chronolens.exe"),
+            ("release", "chronolens"),
+        ):
+            with self.subTest(profile=profile, executable=executable):
+                with tempfile.TemporaryDirectory(prefix="chronolens-path-test-") as workdir:
+                    root = Path(workdir)
+                    candidate = (
+                        root
+                        / "_build"
+                        / "native"
+                        / profile
+                        / "build"
+                        / "cmd"
+                        / "chronolens"
+                        / executable
+                    )
+                    candidate.parent.mkdir(parents=True)
+                    candidate.touch()
+                    with patch.object(demo_server, "ROOT", root):
+                        self.assertEqual(candidate, demo_server.engine_path())
 
     def test_otlp_sample_converts_and_runs_through_cli(self) -> None:
         with tempfile.TemporaryDirectory(prefix="chronolens-otel-test-") as workdir:
