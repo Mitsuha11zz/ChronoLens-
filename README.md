@@ -20,6 +20,7 @@ chronolens/
 ├── cmd/chronolens/           native 文件分析 CLI
 ├── demo/                    本机浏览器工作台与 CLI 请求桥接
 ├── benchmarks/              可复现的 native CLI 容量基准
+├── integration_tests/       OTLP 与本地演示的端到端回归
 ├── examples/two-services/    本机双进程 TCP 采集、输入转换与核心分析样例
 ├── examples/otel-rpc/        OTLP JSON RPC Span 转 ChronoLens JSONL
 ├── examples/json-report/     JSON 报告导出例程及已生成的示例输出
@@ -83,6 +84,16 @@ python benchmarks/capacity.py --messages 100,1000 --repeats 5 --warmups 1
 ```
 
 工具将 JSON 结果写到标准输出；默认测量 100、1,000 和 5,000 条消息，每档运行 3 次并报告中位数。耗时包含 CLI 进程启动、输入读取、分析和报告写入，不包含构建和数据生成。基准使用两个时钟域和一个连通分量，结果用于比较本地版本，不代表多时钟拓扑、峰值内存或生产环境容量保证。
+
+## 集成回归
+
+运行标准库端到端检查，覆盖 OTLP 样例转换到 CLI，以及本地演示 HTTP 样例接口到 CLI 的分析链路：
+
+```text
+python -m unittest discover -s integration_tests -v
+```
+
+测试会先构建 native CLI，演示服务使用随机本机端口，测试数据和报告在系统临时目录中创建并自动清理。
 
 ## 诊断报告
 
