@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: MoonBit and integration checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install MoonBit
+        shell: bash
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Show MoonBit toolchain
+        run: moon version --all
+
+      - name: Refresh MoonBit package index
+        run: moon update
+
+      - name: Check all supported targets
+        run: moon check --target all --deny-warn
+
+      - name: Test all supported targets
+        run: moon test --target all --deny-warn
+
+      - name: Build native CLI
+        run: moon build cmd/chronolens --target native --deny-warn
+
+      - name: Check Python and browser scripts
+        run: |
+          python -m py_compile demo/server.py examples/otel-rpc/convert.py benchmarks/capacity.py integration_tests/test_workflows.py
+          node --check demo/app.js
+
+      - name: Run end-to-end workflow checks
+        run: python -m unittest discover -s integration_tests -v

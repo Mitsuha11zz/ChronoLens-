@@ -95,6 +95,8 @@ python -m unittest discover -s integration_tests -v
 
 测试会先构建 native CLI，演示服务使用随机本机端口，测试数据和报告在系统临时目录中创建并自动清理。
 
+GitHub Actions 工作流 `CI` 会在每次 push、pull request 或手动触发时运行全后端检查与测试、native CLI 构建、Python／JavaScript 语法检查和上述端到端回归。
+
 ## 诊断报告
 
 report 包提供 from_input、from_analysis 和 from_failure，保留输入诊断、模型假设、关联覆盖、分量结果和冲突证据。可导出 chronolens.diagnostic.v1 JSON，也可生成同语义的 Markdown 阅读报告。Int64 在 JSON 中使用十进制字符串，区分有限边界、无界和计算失败。

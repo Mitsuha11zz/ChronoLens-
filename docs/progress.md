@@ -232,3 +232,9 @@ OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/S
 增加 `integration_tests/test_workflows.py`，使用 Python 标准库 `unittest` 覆盖两条交付链路：OTLP 内置 trace 转换为 JSONL 后由正式 native CLI 分析；本地演示的样例 API 与分析 API 在随机回环端口启动，并由其调用同一 native CLI。测试验证事件数、退出码、冲突状态及可行分量；MoonBit native CLI 在测试开始时构建一次，临时输入和报告结束后自动清理。
 
 运行命令：`python -m unittest discover -s integration_tests -v`。测试结果：2 项端到端检查全部通过。测试服务绑定 `127.0.0.1` 上的随机端口，不需要占用演示默认端口；测试不上传数据。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-02：GitHub Actions CI
+
+新增 `.github/workflows/ci.yml`，在 `push`、`pull_request` 和手动触发时执行。工作流安装 MoonBit 与 Python 3.13，刷新 MoonBit 包索引，然后依次运行所有支持后端的 `moon check`、`moon test`，构建 native CLI，检查 Python／JavaScript 语法并执行集成回归。权限仅授予 `contents: read`。
+
+本地验证结果：工作流 YAML 结构检查通过；`moon check --target all --deny-warn` 无警告错误；`moon test --target all --deny-warn` 在 wasm、wasm-gc、js、native 各通过 111/111；native CLI 构建、4 个 Python 文件语法检查、前端 JavaScript 语法检查和 2 项端到端回归均通过。GitHub 托管 runner 上的首次工作流运行需在推送后确认。当前改动未提交、未推送，完成后停止等待用户确认。
