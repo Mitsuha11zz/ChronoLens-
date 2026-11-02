@@ -19,12 +19,12 @@ chronolens/
 ├── report/                  JSON／Markdown 报告与展示数据
 ├── cmd/chronolens/           native 文件分析 CLI
 ├── demo/                    本机浏览器工作台与 CLI 请求桥接
+├── benchmarks/              可复现的 native CLI 容量基准
 ├── examples/two-services/    本机双进程 TCP 采集、输入转换与核心分析样例
 ├── examples/otel-rpc/        OTLP JSON RPC Span 转 ChronoLens JSONL
 ├── examples/json-report/     JSON 报告导出例程及已生成的示例输出
 ├── fixtures/                后续输入与预期结果样例
 ├── docs/
-│   ├── 开发方案.md           已确认选题的完整方案
 │   ├── architecture.md      分包职责与依赖规划
 │   └── progress.md          分阶段进度与确认记录
 ├── AGENTS.md                本项目开发约定
@@ -71,7 +71,18 @@ python examples/two-services/run.py --analyze
 python examples/two-services/run.py --replay examples/two-services/sample
 ```
 
-生产容量和多机器时钟表现仍待验证；本地交互演示与限定范围的 OpenTelemetry RPC 适配器已完成。
+生产容量和多机器时钟表现仍待验证；本地交互演示、限定范围的 OpenTelemetry RPC 适配器和容量基准工具已完成。
+
+## 容量基准
+
+使用 [`benchmarks/capacity.py`](benchmarks/capacity.py) 生成确定规模的成对消息日志，并调用正式 native CLI 测量端到端耗时；参数说明见[基准文档](benchmarks/README.md)：
+
+```text
+python benchmarks/capacity.py
+python benchmarks/capacity.py --messages 100,1000 --repeats 5 --warmups 1
+```
+
+工具将 JSON 结果写到标准输出；默认测量 100、1,000 和 5,000 条消息，每档运行 3 次并报告中位数。耗时包含 CLI 进程启动、输入读取、分析和报告写入，不包含构建和数据生成。基准使用两个时钟域和一个连通分量，结果用于比较本地版本，不代表多时钟拓扑、峰值内存或生产环境容量保证。
 
 ## 诊断报告
 
@@ -83,4 +94,4 @@ report 包提供 from_input、from_analysis 和 from_failure，保留输入诊�
 
 先完成目录骨架，再逐个实现功能。每个功能完成后汇报变更、验证结果与待确认事项，停止并等待用户确认。推送需获得用户明确授权。
 
-正式 CLI、本地交互演示与 OpenTelemetry RPC 适配器已完成，当前功能等待用户确认后再进入下一阶段，详见 [进度记录](docs/progress.md)。
+正式 CLI、本地交互演示、OpenTelemetry RPC 适配器与容量基准工具已完成；当前功能等待用户确认后再进入下一阶段，详见 [进度记录](docs/progress.md)。
