@@ -1,10 +1,12 @@
 import {
   "Mitsuha11zz/chronolens" @core,
+  "Mitsuha11zz/chronolens/constraints",
   "Mitsuha11zz/chronolens/input",
   "Mitsuha11zz/chronolens/report",
   "Mitsuha11zz/chronolens/solver",
   "moonbitlang/core/argparse",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
   "moonbitlang/core/string",
   "moonbitlang/x/fs",
   "moonbitlang/x/sys",

@@ -264,3 +264,9 @@ JSONL 和 typed-event 两个根包入口新增可选 `priors` 参数，接受约
 新增根包黑盒回归用例，直接调用 `analyze_jsonl` 与 `analyze_events`：覆盖 JSONL 有效输入的关联和可行分析、无效输入诊断、typed-event 分析中相对偏移先验及其证据导出，以及重复先验标签返回约束构建阶段诊断。测试同时确认 typed-event 报告不会伪造 parser 输入。
 
 验证：`moon fmt analysis_test.mbt`、`moon test --target all --deny-warn`（wasm、wasm-gc、js、native 均为 115/115）、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 均通过。因本机 MoonBit 工具链重写了五个依赖包的生成接口文件中的 `Int` 类型，本次将这些与测试无关的生成文件还原。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-03：CLI 相对偏移先验文件
+
+正式 CLI 新增 `--priors-file`，可从 JSON 数组加载时钟相对偏移边界并传入根包分析 API。文件解析要求唯一先验标签、明确字段和十进制字符串 Int64；拒绝重复 JSON 字段、未知字段、无效范围及超限文件。上限为 1 MiB、4096 条先验，并阻止输出路径覆盖输入或先验文件。新增 `fixtures/offset-priors.json`，可将现有双服务样例的 B-A 偏移范围约束到 120,000–150,000 微秒。
+
+验证：`moon fmt cmd/chronolens`、`moon check --target native --deny-warn` 和 `moon build cmd/chronolens --target native --deny-warn` 通过。遵循本阶段范围，未新增或运行测试套件；CLI 的实际文件读取与报告输出行为尚未做运行时验证。当前改动未提交、未推送，完成后停止等待用户确认。

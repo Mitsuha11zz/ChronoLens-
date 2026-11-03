@@ -1,0 +1,9 @@
+[
+  {
+    "clock_id": "B",
+    "reference_clock": "A",
+    "label": "calibration-window",
+    "lower_us": "120000",
+    "upper_us": "150000"
+  }
+]

@@ -11,11 +11,14 @@ moon run cmd/chronolens -- fixtures/four-events.jsonl
 moon run cmd/chronolens -- fixtures/four-events.jsonl --format markdown
 moon run cmd/chronolens -- fixtures/four-events.jsonl --output report.json
 moon run cmd/chronolens -- fixtures/four-events.jsonl --reference-clock service-a --relation-tolerance-us 50
+moon run cmd/chronolens -- fixtures/four-events.jsonl --priors-file fixtures/offset-priors.json
 ```
 
 默认输出缩进 JSON 到标准输出。`--format` 可选 `json` 或 `markdown`；`--output` 将报告写入文件。已有输出文件默认不会被覆盖，明确传入 `--force` 后才会替换。
 
 输入字段与时间单位见 [JSONL 输入契约](../../input/README.md)。报告字段与语义见 [诊断报告契约](../../report/README.md)。
+
+`--priors-file` 接收一个 JSON 数组。每项必须包含 `clock_id`、`reference_clock` 和唯一的 `label`；`lower_us`、`upper_us` 可省略或设为 `null`，但至少要有一个边界。边界使用十进制字符串以保留完整 Int64 精度，例如 `"lower_us": "120000"`。未知或重复字段、重复标签和无效范围会作为参数错误拒绝。文件上限为 1 MiB、最多 4096 条先验。示例见 [`fixtures/offset-priors.json`](../../fixtures/offset-priors.json)。先验表达时钟间的相对偏移范围，不表示 UTC 校准。
 
 ## 限制参数
 
@@ -29,9 +32,9 @@ moon run cmd/chronolens -- fixtures/four-events.jsonl --reference-clock service-
 | --- | --- |
 | `0` | 分析完成，未发现冲突 |
 | `1` | 分析完成，至少一个分量存在约束冲突 |
-| `2` | 命令行参数、限制配置或输出目标无效 |
-| `3` | 输入读取或报告写入失败 |
-| `4` | 输入非法、UTF-8 无效或超过输入大小限制 |
+| `2` | 命令行参数、限制配置、先验文件格式或输出目标无效 |
+| `3` | 输入／先验文件读取或报告写入失败 |
+| `4` | 输入非法、UTF-8 无效或输入／先验文件超过大小限制 |
 | `5` | 关联／约束／求解阶段失败，或分析结果不完整 |
 
 输入非法但能生成诊断时，报告仍会输出，退出码为 `4`。求解器输出已知冲突时退出码为 `1`，即使其他分量计算失败；未能确定冲突状态时退出码为 `5`。错误说明写入标准错误，报告写入标准输出或指定文件。

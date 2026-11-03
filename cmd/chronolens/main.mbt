@@ -5,6 +5,7 @@ priv struct CliConfig {
   format : String
   relation_tolerance_us : Int64
   reference_clock : String?
+  priors_path : String?
   input_limits : @input.InputLimits
   solve_limits : @solver.SolveLimits
   force : Bool
@@ -48,6 +49,11 @@ fn cli_command() -> @argparse.Command {
         "reference_clock",
         long="reference-clock",
         about="Reference clock for component offset coordinates.",
+      ),
+      @argparse.OptionArg(
+        "priors_file",
+        long="priors-file",
+        about="Read relative clock offset priors from a JSON file (max 1 MiB).",
       ),
       @argparse.OptionArg(
         "relation_tolerance_us",
@@ -290,6 +296,18 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
   }
 
   let output_path = option_value(matches, "output")
+  let priors_path = option_value(matches, "priors_file")
+  match priors_path {
+    Some(path) => {
+      if path == input_path {
+        return Invalid("--priors-file must not name the input file")
+      }
+      if output_path is Some(output) && path == output {
+        return Invalid("--output must not name the priors file")
+      }
+    }
+    None => ()
+  }
   let force = match matches.flags.get("force") {
     Some(value) => value
     None => false
@@ -304,6 +322,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
     format,
     relation_tolerance_us,
     reference_clock,
+    priors_path,
     input_limits,
     solve_limits,
     force,
@@ -420,6 +439,10 @@ fn emit_report(
         eprintln("ChronoLens: --output must not name the input file.")
         return Some(2)
       }
+      if config.priors_path is Some(priors_path) && path == priors_path {
+        eprintln("ChronoLens: --output must not name the priors file.")
+        return Some(2)
+      }
       if @fs.path_exists(path) && !config.force {
         eprintln(
           "ChronoLens: output file already exists; pass --force to replace it.",
@@ -486,6 +509,25 @@ fn analyzed_exit_code(report : @report.DiagnosticReport) -> Int32 {
 
 ///|
 fn analyze_file(config : CliConfig) -> Int32 {
+  let priors = match config.priors_path {
+    None => []
+    Some(path) =>
+      match load_prior_file(path) {
+        PriorFileLoaded(priors) => priors
+        PriorFileInvalid(message) => {
+          eprintln("ChronoLens: invalid --priors-file: " + message)
+          return 2
+        }
+        PriorFileReadFailure(message) => {
+          eprintln("ChronoLens: failed to read --priors-file: " + message)
+          return 3
+        }
+        PriorFileTooLarge => {
+          eprintln("ChronoLens: priors file exceeds the 1048576-byte limit.")
+          return 4
+        }
+      }
+  }
   let max_input_bytes = config.input_limits.max_input_bytes.to_int64()
   let file_size = input_file_size(config.input_path)
   if file_size >= 0L && file_size > max_input_bytes {
@@ -523,6 +565,7 @@ fn analyze_file(config : CliConfig) -> Int32 {
     text,
     source_path=config.input_path,
     options~,
+    priors~,
   ) catch {
     error => {
       eprintln(

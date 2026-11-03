@@ -48,7 +48,11 @@ moon info
 moon fmt
 ```
 
-CLI 从 JSONL 文件读取事件，并通过根包公开 API 执行分析，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。启动浏览器演示：
+CLI 从 JSONL 文件读取事件，并通过根包公开 API 执行分析，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。
+
+CLI 还可以通过 `--priors-file fixtures/offset-priors.json` 加载时钟间的相对偏移范围，样例会把双服务输入的 B-A 区间收窄到 120,000–150,000 微秒。先验格式、精度约定和限制见 [CLI 文档](cmd/chronolens/README.md)。
+
+启动浏览器演示：
 
 ```text
 python demo/server.py
