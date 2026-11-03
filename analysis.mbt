@@ -53,11 +53,13 @@ fn max_correlation_events(options : AnalysisOptions) -> Int32 {
 fn analyze_correlation(
   correlation : @correlate.CorrelationReport,
   options : AnalysisOptions,
+  priors : ArrayView[@constraints.OffsetPrior],
   input? : @input.InputReport,
 ) -> @report.DiagnosticReport raise @report.ReportError {
   let constraints = @constraints.build(
     correlation,
     relation_tolerance_us=options.relation_tolerance_us,
+    priors~,
     max_constraints=options.solve_limits.max_constraints,
   ) catch {
     error => return @report.from_failure(@report.ConstraintBuild(error), input?)
@@ -81,6 +83,7 @@ pub fn analyze_jsonl(
   text : String,
   source_path~ : String = "<memory>",
   options~ : AnalysisOptions = AnalysisOptions::default(),
+  priors~ : ArrayView[@constraints.OffsetPrior] = [],
 ) -> @report.DiagnosticReport raise @report.ReportError {
   let parsed = @input.parse_jsonl(
     text,
@@ -99,7 +102,7 @@ pub fn analyze_jsonl(
     error =>
       return @report.from_failure(@report.Correlation(error), input=parsed)
   }
-  analyze_correlation(correlation, options, input=parsed)
+  analyze_correlation(correlation, options, priors, input=parsed)
 }
 
 ///|
@@ -113,6 +116,7 @@ pub fn analyze_jsonl(
 pub fn analyze_events(
   events : ArrayView[@model.Event],
   options~ : AnalysisOptions = AnalysisOptions::default(),
+  priors~ : ArrayView[@constraints.OffsetPrior] = [],
 ) -> @report.DiagnosticReport raise @report.ReportError {
   let correlation = @correlate.correlate(
     events,
@@ -120,5 +124,5 @@ pub fn analyze_events(
   ) catch {
     error => return @report.from_failure(@report.Correlation(error))
   }
-  analyze_correlation(correlation, options)
+  analyze_correlation(correlation, options, priors)
 }

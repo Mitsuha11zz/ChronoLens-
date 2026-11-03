@@ -65,7 +65,13 @@ let diagnostic = @chronolens.analyze_jsonl(jsonl)
 let json = diagnostic.stringify(pretty=true)
 ```
 
-`analyze_jsonl` 默认使用零容差和包内资源限制，也可传入 `AnalysisOptions` 指定输入限制、消息关系容差、参考时钟和求解限制。非法 JSONL 与分析阶段失败会以结构化诊断报告返回；报告本身与 CLI 使用相同的数据契约。最终报告与输入无法匹配时会抛出 `ReportError`。
+`analyze_jsonl` 默认使用零容差和包内资源限制，也可传入 `AnalysisOptions` 指定输入限制、消息关系容差、参考时钟和求解限制。已知的时钟相对偏移范围可通过 `priors` 参数传入：
+
+```mbt
+let diagnostic = @chronolens.analyze_jsonl(jsonl, priors=[prior])
+```
+
+`prior` 由 `@constraints.OffsetPrior::new(...)` 创建；该构造器会校验标识和边界范围，错误时抛出 `ConstraintBuildError`。先验标签必须唯一；先验可引入新时钟域，但不会自动锚定到 UTC。非法 JSONL 与分析阶段失败会以结构化诊断报告返回；报告本身与 CLI 使用相同的数据契约。最终报告与输入无法匹配时会抛出 `ReportError`。
 
 如果调用方已经构造好 `ArrayView[model.Event]`，可跳过 JSONL 编码和解析：
 
@@ -73,7 +79,7 @@ let json = diagnostic.stringify(pretty=true)
 let diagnostic = @chronolens.analyze_events(events)
 ```
 
-这个入口沿用相同的关联、求解选项和报告格式；由于没有运行 JSONL 解析，报告中的 `input` 字段为 `null`。事件数上限取配置值和关联包硬上限中的较小值。
+这个入口沿用相同的关联、求解选项、`priors` 参数和报告格式；由于没有运行 JSONL 解析，报告中的 `input` 字段为 `null`。事件数上限取配置值和关联包硬上限中的较小值。
 
 ## OpenTelemetry RPC 数据
 

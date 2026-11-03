@@ -252,3 +252,9 @@ OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/S
 新增 `analyze_events`，接受已构造的 `ArrayView[model.Event]`，直接进入消息关联、约束构建、偏移求解和报告阶段，供 MoonBit 调用方跳过 JSONL 序列化。此入口不产生 parser 诊断，因此报告的 `input` 为 null；重复事件 ID 和缺失／歧义消息仍按既有诊断报告处理。JSONL 和 typed-event 两条入口现在共用约束、求解与报告阶段；关联事件上限使用 `AnalysisOptions.input_limits.max_records`，并受关联包 1,000,000 条硬上限约束。
 
 验证：`moon fmt analysis.mbt`、`moon info analysis.mbt`、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过。本阶段未运行自动化测试套件。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-03：根包偏移先验入口
+
+JSONL 和 typed-event 两个根包入口新增可选 `priors` 参数，接受约束包的 `OffsetPrior` 数组。先验和消息约束在同一次构建中求解，诊断报告沿用既有证据结构；构建阶段的重复标签和算术问题会进入约束构建失败报告。先验表示时钟之间的相对偏移范围，不代表绝对 UTC 校准。
+
+验证：`moon fmt analysis.mbt`、`moon info analysis.mbt`、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过。本阶段未运行自动化测试套件。当前改动未提交、未推送，完成后停止等待用户确认。
