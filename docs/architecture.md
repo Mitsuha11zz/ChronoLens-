@@ -1,10 +1,10 @@
 # 包职责与依赖规划
 
-model、input、correlate、constraints、solver 的核心分析以及 report 的 JSON／Markdown 导出均已实现。根包提供 JSONL 端到端公开入口；CLI 和本地交互演示复用正式分析流程。
+model、input、correlate、constraints、solver 的核心分析以及 report 的 JSON／Markdown 导出均已实现。根包提供 JSONL 和已构造事件集合的端到端公开入口；CLI 和本地交互演示复用正式分析流程。
 
 | 包 | 职责 | 依赖 |
 | --- | --- | --- |
-| 根包 | JSONL 端到端分析 API 与能力组合 | input、correlate、constraints、solver、report |
+| 根包 | JSONL／typed events 端到端分析 API 与能力组合 | model、input、correlate、constraints、solver、report |
 | model | 公共事件、约束、配置和结果类型 | 标准库 |
 | input | JSONL 解析、字段校验、资源限制 | model |
 | correlate | 按消息键配对，报告缺失与歧义；输入报告门控入口 | model、input |

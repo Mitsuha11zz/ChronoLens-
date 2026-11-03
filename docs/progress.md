@@ -246,3 +246,9 @@ OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/S
 根包新增 `AnalysisOptions` 与 `analyze_jsonl`，将 JSONL 解析、消息关联、约束构建、偏移分析和诊断报告组合成一个可供其他 MoonBit 包调用的入口。无效 JSONL 和各分析阶段失败沿用现有结构化诊断报告；默认配置使用零关系容差和包内资源限制。正式 CLI 改为调用根包 API，文件读取、UTF-8 校验、报告输出和退出码仍由 CLI 处理。
 
 验证：`moon fmt analysis.mbt cmd/chronolens`、`moon info analysis.mbt`、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过。本阶段未运行自动化测试套件。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-03：根包 typed-event 分析入口
+
+新增 `analyze_events`，接受已构造的 `ArrayView[model.Event]`，直接进入消息关联、约束构建、偏移求解和报告阶段，供 MoonBit 调用方跳过 JSONL 序列化。此入口不产生 parser 诊断，因此报告的 `input` 为 null；重复事件 ID 和缺失／歧义消息仍按既有诊断报告处理。JSONL 和 typed-event 两条入口现在共用约束、求解与报告阶段；关联事件上限使用 `AnalysisOptions.input_limits.max_records`，并受关联包 1,000,000 条硬上限约束。
+
+验证：`moon fmt analysis.mbt`、`moon info analysis.mbt`、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过。本阶段未运行自动化测试套件。当前改动未提交、未推送，完成后停止等待用户确认。

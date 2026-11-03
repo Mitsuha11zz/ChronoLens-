@@ -3,11 +3,14 @@ package "Mitsuha11zz/chronolens"
 
 import {
   "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/model",
   "Mitsuha11zz/chronolens/report",
   "Mitsuha11zz/chronolens/solver",
 }
 
 // Values
+pub fn analyze_events(ArrayView[@model.Event], options? : AnalysisOptions) -> @report.DiagnosticReport raise @report.ReportError
+
 pub fn analyze_jsonl(String, source_path? : String, options? : AnalysisOptions) -> @report.DiagnosticReport raise @report.ReportError
 
 // Errors

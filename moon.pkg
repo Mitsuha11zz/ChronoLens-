@@ -1,4 +1,5 @@
 import {
+  "Mitsuha11zz/chronolens/model",
   "Mitsuha11zz/chronolens/input",
   "Mitsuha11zz/chronolens/correlate",
   "Mitsuha11zz/chronolens/constraints",

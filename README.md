@@ -67,6 +67,14 @@ let json = diagnostic.stringify(pretty=true)
 
 `analyze_jsonl` 默认使用零容差和包内资源限制，也可传入 `AnalysisOptions` 指定输入限制、消息关系容差、参考时钟和求解限制。非法 JSONL 与分析阶段失败会以结构化诊断报告返回；报告本身与 CLI 使用相同的数据契约。最终报告与输入无法匹配时会抛出 `ReportError`。
 
+如果调用方已经构造好 `ArrayView[model.Event]`，可跳过 JSONL 编码和解析：
+
+```mbt
+let diagnostic = @chronolens.analyze_events(events)
+```
+
+这个入口沿用相同的关联、求解选项和报告格式；由于没有运行 JSONL 解析，报告中的 `input` 字段为 `null`。事件数上限取配置值和关联包硬上限中的较小值。
+
 ## OpenTelemetry RPC 数据
 
 `examples/otel-rpc/` 提供一个标准库转换器，将 OTLP JSON trace 导出的 RPC CLIENT/SERVER Span 起始关系转换为 JSONL，再交由同一 MoonBit CLI 分析。转换语义、时钟域选择和限制见 [适配器文档](examples/otel-rpc/README.md)。
