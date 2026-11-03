@@ -1,2 +1,1 @@
-// ChronoLens public facade.
-// Public entry points will be added one feature at a time after review.
+// ChronoLens public facade for end-to-end JSONL diagnosis.

@@ -1,6 +1,5 @@
 import {
-  "Mitsuha11zz/chronolens/constraints",
-  "Mitsuha11zz/chronolens/correlate",
+  "Mitsuha11zz/chronolens" @core,
   "Mitsuha11zz/chronolens/input",
   "Mitsuha11zz/chronolens/report",
   "Mitsuha11zz/chronolens/solver",

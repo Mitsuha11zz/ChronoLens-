@@ -1,6 +1,6 @@
 # ChronoLens CLI
 
-正式命令行入口读取 ChronoLens JSONL 事件文件，执行输入校验、消息关联、差分约束构建和偏移分析，然后输出诊断报告。
+正式命令行入口读取 ChronoLens JSONL 事件文件，通过根包的 `analyze_jsonl` API 执行输入校验、消息关联、差分约束构建和偏移分析，然后输出诊断报告。其他 MoonBit 调用方可直接使用同一 API，无需文件 IO 或 CLI。
 
 ## 使用
 

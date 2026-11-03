@@ -239,4 +239,10 @@ OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/S
 
 本地验证结果：工作流 YAML 结构检查通过；`moon check --target all --deny-warn` 无警告错误；`moon test --target all --deny-warn` 在 wasm、wasm-gc、js、native 各通过 111/111；native CLI 构建、4 个 Python 文件语法检查、前端 JavaScript 语法检查和 2 项端到端回归均通过。GitHub 托管 runner 上的首次工作流运行需在推送后确认。当前改动未提交、未推送，完成后停止等待用户确认。
 
-首次 GitHub Actions 运行在集成测试启动阶段失败：MoonBit native 构建成功，但测试入口按操作系统和固定 debug 路径查找 CLI，未在 runner 上的预期位置找到产物。现已将构建与定位统一到 `demo.server`，同时查找 `chronolens.exe`／`chronolens` 及 debug／release 目录；集成测试新增路径变体回归。本地 3 项集成回归全部通过；GitHub 托管 runner 结果需推送后复验，尚未确认 Linux runner 结果。
+首次 GitHub Actions 运行在集成测试启动阶段失败：MoonBit native 构建成功，但测试入口按操作系统和固定 debug 路径查找 CLI，未在 runner 上的预期位置找到产物。之后将构建与定位统一到 `demo.server`，同时查找 `chronolens.exe`／`chronolens` 及 debug／release 目录，并增加路径变体回归。本地 3 项集成回归通过；修复推送后的 GitHub Actions 复验已通过。
+
+## 2026-11-02：MoonBit 根包 JSONL 分析 API
+
+根包新增 `AnalysisOptions` 与 `analyze_jsonl`，将 JSONL 解析、消息关联、约束构建、偏移分析和诊断报告组合成一个可供其他 MoonBit 包调用的入口。无效 JSONL 和各分析阶段失败沿用现有结构化诊断报告；默认配置使用零关系容差和包内资源限制。正式 CLI 改为调用根包 API，文件读取、UTF-8 校验、报告输出和退出码仍由 CLI 处理。
+
+验证：`moon fmt analysis.mbt cmd/chronolens`、`moon info analysis.mbt`、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过。本阶段未运行自动化测试套件。当前改动未提交、未推送，完成后停止等待用户确认。

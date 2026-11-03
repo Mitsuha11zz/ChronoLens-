@@ -1,11 +1,26 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Mitsuha11zz/chronolens"
 
+import {
+  "Mitsuha11zz/chronolens/input",
+  "Mitsuha11zz/chronolens/report",
+  "Mitsuha11zz/chronolens/solver",
+}
+
 // Values
+pub fn analyze_jsonl(String, source_path? : String, options? : AnalysisOptions) -> @report.DiagnosticReport raise @report.ReportError
 
 // Errors
 
 // Types and methods
+pub(all) struct AnalysisOptions {
+  input_limits : @input.InputLimits
+  relation_tolerance_us : Int64
+  reference_clock : String?
+  solve_limits : @solver.SolveLimits
+}
+pub fn AnalysisOptions::default() -> Self
+pub impl Default for AnalysisOptions
 
 // Type aliases
 

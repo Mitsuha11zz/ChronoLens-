@@ -10,7 +10,8 @@ MoonBit 实现的分布式日志时间约束诊断库，配套离线 CLI 与本�
 chronolens/
 ├── moon.mod                 模块信息：Mitsuha11zz/chronolens
 ├── moon.pkg                 根包配置
-├── chronolens.mbt            未来的公开入口
+├── chronolens.mbt            根包公开入口
+├── analysis.mbt              JSONL 端到端分析编排
 ├── model/                   公共事件、约束与报告类型
 ├── input/                   JSONL 解析、校验与输入限制
 ├── correlate/               消息配对与关联质量诊断
@@ -47,13 +48,24 @@ moon info
 moon fmt
 ```
 
-CLI 从 JSONL 文件读取事件，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。启动浏览器演示：
+CLI 从 JSONL 文件读取事件，并通过根包公开 API 执行分析，可输出 JSON 或 Markdown 诊断报告；使用方式、限制参数和退出码见 [CLI 文档](cmd/chronolens/README.md)。启动浏览器演示：
 
 ```text
 python demo/server.py
 ```
 
 服务只监听 `127.0.0.1:8765`，启动时构建 native CLI。演示说明和模型边界见 [demo 文档](demo/README.md)。
+
+## MoonBit 库 API
+
+其他 MoonBit 项目可以直接调用根包完成 JSONL 解析、关联、约束分析和诊断报告生成：
+
+```mbt
+let diagnostic = @chronolens.analyze_jsonl(jsonl)
+let json = diagnostic.stringify(pretty=true)
+```
+
+`analyze_jsonl` 默认使用零容差和包内资源限制，也可传入 `AnalysisOptions` 指定输入限制、消息关系容差、参考时钟和求解限制。非法 JSONL 与分析阶段失败会以结构化诊断报告返回；报告本身与 CLI 使用相同的数据契约。最终报告与输入无法匹配时会抛出 `ReportError`。
 
 ## OpenTelemetry RPC 数据
 

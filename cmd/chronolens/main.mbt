@@ -455,12 +455,31 @@ fn finish_report(
 ///|
 fn analyzed_exit_code(report : @report.DiagnosticReport) -> Int32 {
   match report.to_json() {
-    Json::Object(fields) =>
+    Json::Object(fields) => {
+      let status = match fields.get("status") {
+        Some(Json::String(value)) => value
+        _ => ""
+      }
+      if status == "input_invalid" || status == "input_limited" {
+        return 4
+      }
+      let input_configuration_failed = match fields.get("failure") {
+        Some(Json::Object(failure)) =>
+          match failure.get("stage") {
+            Some(Json::String(stage)) => stage == "input_configuration"
+            _ => false
+          }
+        _ => false
+      }
+      if input_configuration_failed {
+        return 2
+      }
       match fields.get("has_conflicts") {
         Some(Json::True) => 1
         Some(Json::False) => 0
         _ => 5
       }
+    }
     _ => 5
   }
 }
@@ -494,72 +513,17 @@ fn analyze_file(config : CliConfig) -> Int32 {
     return 4
   }
   let text = @unicode.to_utf8_string(bytes)
-  let parsed = @input.parse_jsonl(
+  let options = @core.AnalysisOptions::{
+    input_limits: config.input_limits,
+    relation_tolerance_us: config.relation_tolerance_us,
+    reference_clock: config.reference_clock,
+    solve_limits: config.solve_limits,
+  }
+  let report = @core.analyze_jsonl(
     text,
     source_path=config.input_path,
-    limits=config.input_limits,
+    options~,
   ) catch {
-    error => {
-      eprintln(
-        "ChronoLens: invalid input configuration: " + @debug.to_string(error),
-      )
-      return 2
-    }
-  }
-  if !parsed.is_valid() {
-    return finish_report(
-      @report.from_input(parsed),
-      config.input_path,
-      config,
-      4,
-    )
-  }
-
-  let correlation = @correlate.correlate_input(parsed) catch {
-    error =>
-      return finish_report(
-        @report.from_failure(@report.Correlation(error), input=parsed),
-        config.input_path,
-        config,
-        5,
-      )
-  }
-  let constraints = @constraints.build(
-    correlation,
-    relation_tolerance_us=config.relation_tolerance_us,
-    max_constraints=config.solve_limits.max_constraints,
-  ) catch {
-    error =>
-      return finish_report(
-        @report.from_failure(@report.ConstraintBuild(error), input=parsed),
-        config.input_path,
-        config,
-        5,
-      )
-  }
-  let analysis = match config.reference_clock {
-    Some(reference_clock) =>
-      @solver.analyze(constraints, reference_clock~, limits=config.solve_limits) catch {
-        error =>
-          return finish_report(
-            @report.from_failure(@report.Solver(error), input=parsed),
-            config.input_path,
-            config,
-            5,
-          )
-      }
-    None =>
-      @solver.analyze(constraints, limits=config.solve_limits) catch {
-        error =>
-          return finish_report(
-            @report.from_failure(@report.Solver(error), input=parsed),
-            config.input_path,
-            config,
-            5,
-          )
-      }
-  }
-  let report = @report.from_analysis(analysis, input=parsed) catch {
     error => {
       eprintln(
         "ChronoLens: failed to construct diagnostic report: " +
