@@ -258,3 +258,9 @@ OTLP JSON 字段、标识和时间戳依据 OpenTelemetry OTLP 规范；CLIENT/S
 JSONL 和 typed-event 两个根包入口新增可选 `priors` 参数，接受约束包的 `OffsetPrior` 数组。先验和消息约束在同一次构建中求解，诊断报告沿用既有证据结构；构建阶段的重复标签和算术问题会进入约束构建失败报告。先验表示时钟之间的相对偏移范围，不代表绝对 UTC 校准。
 
 验证：`moon fmt analysis.mbt`、`moon info analysis.mbt`、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 通过。本阶段未运行自动化测试套件。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-03：根包分析 API 与先验回归覆盖
+
+新增根包黑盒回归用例，直接调用 `analyze_jsonl` 与 `analyze_events`：覆盖 JSONL 有效输入的关联和可行分析、无效输入诊断、typed-event 分析中相对偏移先验及其证据导出，以及重复先验标签返回约束构建阶段诊断。测试同时确认 typed-event 报告不会伪造 parser 输入。
+
+验证：`moon fmt analysis_test.mbt`、`moon test --target all --deny-warn`（wasm、wasm-gc、js、native 均为 115/115）、`moon check --target all --deny-warn`、`moon build cmd/chronolens --target native --deny-warn` 和 `git diff --check` 均通过。因本机 MoonBit 工具链重写了五个依赖包的生成接口文件中的 `Int` 类型，本次将这些与测试无关的生成文件还原。当前改动未提交、未推送，完成后停止等待用户确认。
