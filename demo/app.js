@@ -14,6 +14,9 @@ const ui = {
   priorCount: byId("prior-count"),
   addPrior: byId("add-prior-button"),
   priorExample: byId("prior-example-button"),
+  exportPriors: byId("export-priors-button"),
+  importPriors: byId("import-priors-button"),
+  importPriorsFile: byId("import-priors-file"),
   analyze: byId("analyze-button"),
   export: byId("export-button"),
   empty: byId("empty-state"),
@@ -86,6 +89,7 @@ function updatePriorCount() {
   const count = ui.priorList.querySelectorAll("[data-prior-row]").length;
   ui.priorCount.textContent = `${count} 条`;
   ui.addPrior.disabled = count >= MAX_PRIOR_ROWS;
+  ui.exportPriors.disabled = count === 0;
 }
 
 function priorField(label, name, placeholder, wide = false) {
@@ -147,12 +151,31 @@ function addPriorRow(values = {}) {
   return card;
 }
 
-function collectPriors() {
+const priorFields = ["clock_id", "reference_clock", "label", "lower_us", "upper_us"];
+
+function readPriorRows() {
+  return Array.from(ui.priorList.querySelectorAll("[data-prior-row]"), (row) =>
+    Object.fromEntries(priorFields.map((name) => [
+      name, row.querySelector(`[data-prior-field="${name}"]`).value,
+    ])),
+  );
+}
+
+function validatePriors(rows, labels = new Set()) {
   const priors = [];
-  const labels = new Set();
-  const rows = ui.priorList.querySelectorAll("[data-prior-row]");
-  for (const [index, row] of Array.from(rows).entries()) {
-    const value = (name) => row.querySelector(`[data-prior-field="${name}"]`).value.trim();
+  for (const [index, row] of rows.entries()) {
+    if (!row || typeof row !== "object" || Array.isArray(row) ||
+        Object.keys(row).some((name) => !priorFields.includes(name))) {
+      throw new Error(`第 ${index + 1} 条先验的结构或字段无效。`);
+    }
+    const value = (name) => {
+      const raw = row[name];
+      if (raw == null && name.endsWith("_us")) return "";
+      if (typeof raw !== "string" || raw.length > 4096) {
+        throw new Error(`第 ${index + 1} 条先验的 ${name} 必须是有效字符串。`);
+      }
+      return raw.trim();
+    };
     const clockId = value("clock_id");
     const referenceClock = value("reference_clock");
     const label = value("label");
@@ -196,6 +219,31 @@ function collectPriors() {
     });
   }
   return priors;
+}
+
+function collectPriors() {
+  return validatePriors(readPriorRows());
+}
+
+async function importPriors(file) {
+  if (!file) return;
+  try {
+    if (file.size > 1024 * 1024) throw new Error("先验 JSON 超过 1 MiB 文件上限。");
+    const contents = new TextDecoder("utf-8", { fatal: true }).decode(await file.arrayBuffer());
+    const incoming = JSON.parse(contents);
+    if (!Array.isArray(incoming) || incoming.length === 0) {
+      throw new Error("先验文件必须包含非空 JSON 数组。");
+    }
+    const existing = readPriorRows();
+    if (existing.length + incoming.length > MAX_PRIOR_ROWS) {
+      throw new Error(`导入后不能超过 ${MAX_PRIOR_ROWS} 条先验。`);
+    }
+    const priors = validatePriors(incoming, new Set(existing.map(({ label }) => label.trim())));
+    for (const prior of priors) addPriorRow(prior);
+    showToast(`已追加 ${priors.length} 条先验。`);
+  } catch (error) {
+    showToast(`导入失败：${error.message}`, "is-error");
+  }
 }
 
 async function loadPriorExample() {
@@ -742,19 +790,37 @@ async function runAnalysis() {
   }
 }
 
-function exportReport() {
-  if (!state.report) return;
-  const blob = new Blob([`${JSON.stringify(state.report, null, 2)}\n`], {
+function jsonBlob(value) {
+  return new Blob([`${JSON.stringify(value, null, 2)}\n`], {
     type: "application/json;charset=utf-8",
   });
+}
+
+function downloadJson(blob, filename) {
   const url = URL.createObjectURL(blob);
   const anchor = element("a");
   anchor.href = url;
-  anchor.download = "chronolens-diagnostic.json";
+  anchor.download = filename;
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(url);
+}
+
+function exportReport() {
+  if (state.report) downloadJson(jsonBlob(state.report), "chronolens-diagnostic.json");
+}
+
+function exportPriors() {
+  try {
+    const priors = collectPriors();
+    if (priors.length === 0) return;
+    const blob = jsonBlob(priors);
+    if (blob.size > 1024 * 1024) throw new Error("先验 JSON 超过 CLI 的 1 MiB 文件上限。");
+    downloadJson(blob, "chronolens-offset-priors.json");
+  } catch (error) {
+    showToast(error.message || "无法下载相对偏移先验。", "is-error");
+  }
 }
 
 ui.sample.addEventListener("change", () => {
@@ -765,6 +831,13 @@ ui.addPrior.addEventListener("click", () => {
   addPriorRow();
 });
 ui.priorExample.addEventListener("click", loadPriorExample);
+ui.exportPriors.addEventListener("click", exportPriors);
+ui.importPriors.addEventListener("click", () => ui.importPriorsFile.click());
+ui.importPriorsFile.addEventListener("change", () => {
+  const file = ui.importPriorsFile.files?.[0];
+  ui.importPriorsFile.value = "";
+  importPriors(file);
+});
 ui.file.addEventListener("change", () => acceptFile(ui.file.files?.[0]));
 ui.input.addEventListener("input", updateLineCount);
 ui.analyze.addEventListener("click", runAnalysis);

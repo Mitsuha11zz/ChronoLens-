@@ -110,10 +110,13 @@
                   <p class="prior-help">给两个时钟之间的偏移差设定已知范围。先验是分析假设，不代表 UTC 校准。</p>
                   <div class="prior-actions">
                     <button class="minor-button" id="prior-example-button" type="button">载入配套示例</button>
+                    <button class="minor-button" id="export-priors-button" type="button" disabled>下载先验 JSON</button>
+                    <button class="minor-button" id="import-priors-button" type="button">从 JSON 追加先验</button>
+                    <input id="import-priors-file" type="file" accept=".json,application/json" hidden>
                     <button class="minor-button is-accent" id="add-prior-button" type="button">＋ 添加范围</button>
                   </div>
                   <div class="prior-list" id="prior-list" aria-live="polite"></div>
-                  <p class="prior-limit">最多 64 条 · 边界使用 Int64 微秒</p>
+                  <p class="prior-limit">最多 64 条 · 边界使用 Int64 微秒 · 下载的文件可用于 CLI 的 --priors-file</p>
                 </div>
               </details>
               <p class="assumption-note">固定偏移模型 · 未添加先验时只使用消息约束</p>
