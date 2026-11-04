@@ -10,10 +10,11 @@ import {
 pub fn parse_jsonl(String, source_path? : String, limits? : InputLimits) -> InputReport raise InputConfigError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror InputConfigError {
   InvalidLimit(String)
   InvalidSourcePath
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn InputConfigError::equal(Self, Self) -> Bool
 #deprecated
@@ -22,10 +23,11 @@ pub fn InputConfigError::not_equal(Self, Self) -> Bool
 pub fn InputConfigError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub struct InputIssue {
-  line : Int?
+  line : Int32?
   kind : IssueKind
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn InputIssue::equal(Self, Self) -> Bool
 #deprecated
@@ -34,31 +36,32 @@ pub fn InputIssue::not_equal(Self, Self) -> Bool
 pub fn InputIssue::to_repr(Self) -> @debug.Repr
 
 pub struct InputLimits {
-  max_input_bytes : Int
-  max_line_bytes : Int
-  max_records : Int
-  max_clock_domains : Int
-  max_field_bytes : Int
-  max_issues : Int
-  max_json_depth : Int
+  max_input_bytes : Int32
+  max_line_bytes : Int32
+  max_records : Int32
+  max_clock_domains : Int32
+  max_field_bytes : Int32
+  max_issues : Int32
+  max_json_depth : Int32
 }
 pub fn InputLimits::default() -> Self
-pub fn InputLimits::new(max_input_bytes? : Int, max_line_bytes? : Int, max_records? : Int, max_clock_domains? : Int, max_field_bytes? : Int, max_issues? : Int, max_json_depth? : Int) -> Self raise InputConfigError
+pub fn InputLimits::new(max_input_bytes? : Int32, max_line_bytes? : Int32, max_records? : Int32, max_clock_domains? : Int32, max_field_bytes? : Int32, max_issues? : Int32, max_json_depth? : Int32) -> Self raise InputConfigError
 pub impl Default for InputLimits
 
 pub struct InputReport {
   accepted_events : ReadOnlyArray[@model.Event]
   issues : ReadOnlyArray[InputIssue]
   status : InputStatus
-  records_seen : Int
+  records_seen : Int32
 }
 pub fn InputReport::is_valid(Self) -> Bool
 pub fn InputReport::validated_events(Self) -> Array[@model.Event]?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum InputStatus {
   Complete
   Limited(String)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn InputStatus::equal(Self, Self) -> Bool
 #deprecated
@@ -66,6 +69,7 @@ pub fn InputStatus::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn InputStatus::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum IssueKind {
   InvalidJson
   ExpectedObject
@@ -75,9 +79,9 @@ pub(all) enum IssueKind {
   UnknownField(String)
   DuplicateField(String)
   InvalidValue(String)
-  DuplicateEventId(first_line~ : Int)
+  DuplicateEventId(first_line~ : Int32)
   LimitExceeded(String)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn IssueKind::equal(Self, Self) -> Bool
 #deprecated

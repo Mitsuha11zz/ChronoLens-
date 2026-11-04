@@ -1,8 +1,9 @@
 ///|
+#derive(Debug, Eq)
 pub(all) suberror InputConfigError {
   InvalidLimit(String)
   InvalidSourcePath
-} derive(Debug, Eq)
+}
 
 ///|
 pub struct InputLimits {

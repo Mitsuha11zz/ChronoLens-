@@ -17,20 +17,22 @@ pub extend DifferenceConstraint with Eq::{equal, not_equal}
 ///|
 /// Evidence behind a constraint. Message references identify source events;
 /// a prior label identifies a user-supplied assumption.
+#derive(Debug, Eq)
 pub(all) enum ConstraintOrigin {
   Message(send_event_id~ : String, receive_event_id~ : String)
   Prior(label~ : String)
-} derive(Debug, Eq)
+}
 
 ///|
 /// The inequality is offset(left_clock) - offset(right_clock) <= upper_bound_us.
 /// Its graph edge goes from right_clock to left_clock.
+#derive(Debug, Eq)
 pub struct DifferenceConstraint {
   left_clock : String
   right_clock : String
   upper_bound_us : Int64
   origin : ConstraintOrigin
-} derive(Debug, Eq)
+}
 
 ///|
 /// Negative bounds and same-clock constraints are valid model inputs.

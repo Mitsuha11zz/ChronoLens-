@@ -8,10 +8,11 @@ pub extend SourceLocation with Eq::{equal, not_equal}
 
 ///|
 /// Optional evidence location; line numbers are one-based.
+#derive(Debug, Eq)
 pub struct SourceLocation {
   path : String
   line : Int
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn SourceLocation::new(

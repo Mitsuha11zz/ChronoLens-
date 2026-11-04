@@ -9,6 +9,7 @@ pub extend Event with Eq::{equal, not_equal}
 ///|
 /// An immutable observation. Timestamp units are signed integer microseconds.
 /// Event-id uniqueness is a dataset-level responsibility.
+#derive(Debug, Eq)
 pub struct Event {
   event_id : String
   clock_id : String
@@ -16,7 +17,7 @@ pub struct Event {
   kind : EventKind
   timestamp_us : Int64
   source : SourceLocation?
-} derive(Debug, Eq)
+}
 
 ///|
 /// Create an observation without changing its timestamp or identifier text.

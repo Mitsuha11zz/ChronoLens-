@@ -17,18 +17,19 @@ pub fn solve(@constraints.ConstraintSet, limits? : SolveLimits) -> SolveReport r
 pub fn solve_constraints(ArrayView[@model.DifferenceConstraint], clock_ids? : ArrayView[String], limits? : SolveLimits) -> ConstraintSolution raise SolveError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror SolveError {
   InvalidLimit(String)
-  ClockLimitExceeded(Int)
-  ConstraintLimitExceeded(Int)
+  ClockLimitExceeded(Int32)
+  ConstraintLimitExceeded(Int32)
   EmptyClockId
   UnknownReferenceClock(String)
   OffsetOverflow(clock_id~ : String, reference_clock~ : String)
   BoundOverflow(clock_id~ : String, lower_bound~ : Bool)
   EdgeVisitLimitExceeded(Int64)
-  ArithmeticOverflow(phase~ : SolvePhase, constraint_index~ : Int)
+  ArithmeticOverflow(phase~ : SolvePhase, constraint_index~ : Int32)
   InvalidWitness
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn SolveError::equal(Self, Self) -> Bool
 #deprecated
@@ -37,10 +38,11 @@ pub fn SolveError::not_equal(Self, Self) -> Bool
 pub fn SolveError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub struct AnalysisReport {
   input : @constraints.ConstraintSet
   analysis : ConstraintAnalysis
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn AnalysisReport::equal(Self, Self) -> Bool
 #deprecated
@@ -48,10 +50,11 @@ pub fn AnalysisReport::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn AnalysisReport::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct ClockOffset {
   clock_id : String
   offset_us : Int64
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ClockOffset::equal(Self, Self) -> Bool
 #deprecated
@@ -59,14 +62,15 @@ pub fn ClockOffset::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ClockOffset::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct ComponentAnalysis {
-  component_id : Int
+  component_id : Int32
   clocks : ReadOnlyArray[String]
   reference_clock : String
-  constraint_indices : ReadOnlyArray[Int]
+  constraint_indices : ReadOnlyArray[Int32]
   outcome : ComponentOutcome
   stats : SolveStats
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ComponentAnalysis::equal(Self, Self) -> Bool
 #deprecated
@@ -74,11 +78,12 @@ pub fn ComponentAnalysis::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ComponentAnalysis::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ComponentOutcome {
   ComponentFeasible(offsets~ : ReadOnlyArray[ClockOffset], intervals~ : ReadOnlyArray[OffsetInterval])
   ComponentInfeasible(cycle~ : NegativeCycle)
   ComponentFailed(error~ : SolveError)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ComponentOutcome::equal(Self, Self) -> Bool
 #deprecated
@@ -86,12 +91,13 @@ pub fn ComponentOutcome::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ComponentOutcome::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct ConstraintAnalysis {
   clocks : ReadOnlyArray[String]
   constraints : ReadOnlyArray[@model.DifferenceConstraint]
   components : ReadOnlyArray[ComponentAnalysis]
   stats : SolveStats
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ConstraintAnalysis::equal(Self, Self) -> Bool
 #deprecated
@@ -99,12 +105,13 @@ pub fn ConstraintAnalysis::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ConstraintAnalysis::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct ConstraintSolution {
   clocks : ReadOnlyArray[String]
   constraints : ReadOnlyArray[@model.DifferenceConstraint]
   outcome : Feasibility
   stats : SolveStats
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ConstraintSolution::equal(Self, Self) -> Bool
 #deprecated
@@ -112,10 +119,11 @@ pub fn ConstraintSolution::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ConstraintSolution::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct CycleEdge {
-  constraint_index : Int
+  constraint_index : Int32
   constraint : @model.DifferenceConstraint
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn CycleEdge::equal(Self, Self) -> Bool
 #deprecated
@@ -123,10 +131,11 @@ pub fn CycleEdge::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn CycleEdge::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Feasibility {
   Feasible(offsets~ : ReadOnlyArray[ClockOffset])
   Infeasible(cycle~ : NegativeCycle)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn Feasibility::equal(Self, Self) -> Bool
 #deprecated
@@ -134,10 +143,11 @@ pub fn Feasibility::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn Feasibility::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct NegativeCycle {
   edges : ReadOnlyArray[CycleEdge]
   total_weight_us : Int64
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn NegativeCycle::equal(Self, Self) -> Bool
 #deprecated
@@ -145,10 +155,11 @@ pub fn NegativeCycle::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn NegativeCycle::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum OffsetBound {
   Finite(Int64)
   Unbounded
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn OffsetBound::equal(Self, Self) -> Bool
 #deprecated
@@ -156,11 +167,12 @@ pub fn OffsetBound::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn OffsetBound::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct OffsetInterval {
   clock_id : String
   lower : OffsetBound
   upper : OffsetBound
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn OffsetInterval::equal(Self, Self) -> Bool
 #deprecated
@@ -169,21 +181,22 @@ pub fn OffsetInterval::not_equal(Self, Self) -> Bool
 pub fn OffsetInterval::to_repr(Self) -> @debug.Repr
 
 pub struct SolveLimits {
-  max_clocks : Int
-  max_constraints : Int
+  max_clocks : Int32
+  max_constraints : Int32
   max_edge_visits : Int64
 }
 pub fn SolveLimits::default() -> Self
-pub fn SolveLimits::new(max_clocks? : Int, max_constraints? : Int, max_edge_visits? : Int64) -> Self raise SolveError
+pub fn SolveLimits::new(max_clocks? : Int32, max_constraints? : Int32, max_edge_visits? : Int64) -> Self raise SolveError
 pub impl Default for SolveLimits
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SolvePhase {
   Relaxation
   FeasibleVerification
   CycleWeightSum
   UpperBoundPaths
   LowerBoundPaths
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn SolvePhase::equal(Self, Self) -> Bool
 #deprecated
@@ -191,10 +204,11 @@ pub fn SolvePhase::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn SolvePhase::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct SolveReport {
   input : @constraints.ConstraintSet
   solution : ConstraintSolution
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn SolveReport::equal(Self, Self) -> Bool
 #deprecated
@@ -202,12 +216,13 @@ pub fn SolveReport::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn SolveReport::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct SolveStats {
-  clock_count : Int
-  constraint_count : Int
-  passes : Int
+  clock_count : Int32
+  constraint_count : Int32
+  passes : Int32
   edge_visits : Int64
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn SolveStats::equal(Self, Self) -> Bool
 #deprecated

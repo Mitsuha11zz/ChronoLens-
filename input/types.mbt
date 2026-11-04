@@ -1,4 +1,5 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum IssueKind {
   InvalidJson
   ExpectedObject
@@ -10,20 +11,22 @@ pub(all) enum IssueKind {
   InvalidValue(String)
   DuplicateEventId(first_line~ : Int)
   LimitExceeded(String)
-} derive(Debug, Eq)
+}
 
 ///|
 /// Physical input location, independent of any declared event source.
+#derive(Debug, Eq)
 pub struct InputIssue {
   line : Int?
   kind : IssueKind
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum InputStatus {
   Complete
   Limited(String)
-} derive(Debug, Eq)
+}
 
 ///|
 /// Accepted events are previews until is_valid() is true.

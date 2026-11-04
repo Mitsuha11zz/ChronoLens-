@@ -8,11 +8,12 @@ import {
 // Values
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror ModelError {
   EmptyIdentifier(String)
-  InvalidAttempt(Int)
-  InvalidSourceLine(Int)
-} derive(Eq, @debug.Debug)
+  InvalidAttempt(Int32)
+  InvalidSourceLine(Int32)
+}
 #deprecated
 pub fn ModelError::equal(Self, Self) -> Bool
 #deprecated
@@ -21,10 +22,11 @@ pub fn ModelError::not_equal(Self, Self) -> Bool
 pub fn ModelError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum ConstraintOrigin {
   Message(send_event_id~ : String, receive_event_id~ : String)
   Prior(label~ : String)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ConstraintOrigin::equal(Self, Self) -> Bool
 #deprecated
@@ -32,12 +34,13 @@ pub fn ConstraintOrigin::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ConstraintOrigin::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct DifferenceConstraint {
   left_clock : String
   right_clock : String
   upper_bound_us : Int64
   origin : ConstraintOrigin
-} derive(Eq, @debug.Debug)
+}
 pub fn DifferenceConstraint::edge_from(Self) -> String
 pub fn DifferenceConstraint::edge_to(Self) -> String
 #deprecated
@@ -52,6 +55,7 @@ pub fn DifferenceConstraint::right_clock(Self) -> String
 pub fn DifferenceConstraint::to_repr(Self) -> @debug.Repr
 pub fn DifferenceConstraint::upper_bound_us(Self) -> Int64
 
+#derive(Eq, @debug.Debug)
 pub struct Event {
   event_id : String
   clock_id : String
@@ -59,7 +63,7 @@ pub struct Event {
   kind : EventKind
   timestamp_us : Int64
   source : SourceLocation?
-} derive(Eq, @debug.Debug)
+}
 pub fn Event::clock_id(Self) -> String
 #deprecated
 pub fn Event::equal(Self, Self) -> Bool
@@ -74,10 +78,11 @@ pub fn Event::timestamp_us(Self) -> Int64
 #deprecated
 pub fn Event::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum EventKind {
   Send
   Receive
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn EventKind::equal(Self, Self) -> Bool
 #deprecated
@@ -85,34 +90,36 @@ pub fn EventKind::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn EventKind::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, Hash, @debug.Debug)
 pub struct MessageKey {
   trace_id : String
   message_id : String
-  attempt : Int
-} derive(Eq, Hash, @debug.Debug)
-pub fn MessageKey::attempt(Self) -> Int
+  attempt : Int32
+}
+pub fn MessageKey::attempt(Self) -> Int32
 #deprecated
 pub fn MessageKey::equal(Self, Self) -> Bool
 #deprecated
-pub fn MessageKey::hash(Self) -> Int
+pub fn MessageKey::hash(Self) -> Int32
 #deprecated
 pub fn MessageKey::hash_combine(Self, Hasher) -> Unit
 pub fn MessageKey::message_id(Self) -> String
-pub fn MessageKey::new(trace_id~ : String, message_id~ : String, attempt~ : Int) -> Self raise ModelError
+pub fn MessageKey::new(trace_id~ : String, message_id~ : String, attempt~ : Int32) -> Self raise ModelError
 #deprecated
 pub fn MessageKey::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn MessageKey::to_repr(Self) -> @debug.Repr
 pub fn MessageKey::trace_id(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub struct SourceLocation {
   path : String
-  line : Int
-} derive(Eq, @debug.Debug)
+  line : Int32
+}
 #deprecated
 pub fn SourceLocation::equal(Self, Self) -> Bool
-pub fn SourceLocation::line(Self) -> Int
-pub fn SourceLocation::new(path~ : String, line~ : Int) -> Self raise ModelError
+pub fn SourceLocation::line(Self) -> Int32
+pub fn SourceLocation::new(path~ : String, line~ : Int32) -> Self raise ModelError
 #deprecated
 pub fn SourceLocation::not_equal(Self, Self) -> Bool
 pub fn SourceLocation::path(Self) -> String

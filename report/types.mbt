@@ -1,17 +1,19 @@
 ///|
 /// Typed pipeline failures are exported separately from feasibility verdicts.
+#derive(Debug, Eq)
 pub(all) enum PipelineFailure {
   InputConfiguration(@input.InputConfigError)
   Correlation(@correlate.CorrelationError)
   ConstraintBuild(@constraints.ConstraintBuildError)
   Solver(@solver.SolveError)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) suberror ReportError {
   InvalidInputReport
   MismatchedInputEvents
-} derive(Debug, Eq)
+}
 
 ///|
 priv enum ReportSource {

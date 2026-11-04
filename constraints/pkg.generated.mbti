@@ -8,9 +8,10 @@ import {
 }
 
 // Values
-pub fn build(@correlate.CorrelationReport, relation_tolerance_us? : Int64, priors? : ArrayView[OffsetPrior], max_constraints? : Int) -> ConstraintSet raise ConstraintBuildError
+pub fn build(@correlate.CorrelationReport, relation_tolerance_us? : Int64, priors? : ArrayView[OffsetPrior], max_constraints? : Int32) -> ConstraintSet raise ConstraintBuildError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror ConstraintBuildError {
   InvalidTolerance
   InvalidPriorField(String)
@@ -18,9 +19,9 @@ pub(all) suberror ConstraintBuildError {
   InvertedPriorRange(String)
   DuplicatePriorLabel(String)
   InvalidConstraintLimit
-  ConstraintLimitExceeded(Int)
+  ConstraintLimitExceeded(Int32)
   ArithmeticOverflow(@model.ConstraintOrigin)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ConstraintBuildError::equal(Self, Self) -> Bool
 #deprecated
@@ -29,10 +30,11 @@ pub fn ConstraintBuildError::not_equal(Self, Self) -> Bool
 pub fn ConstraintBuildError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub struct BuiltConstraint {
   constraint : @model.DifferenceConstraint
   evidence : ConstraintEvidence
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn BuiltConstraint::equal(Self, Self) -> Bool
 #deprecated
@@ -40,10 +42,11 @@ pub fn BuiltConstraint::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn BuiltConstraint::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ConstraintEvidence {
   Message(pair~ : @correlate.MessagePair, tolerance_us~ : Int64)
   Prior(prior~ : OffsetPrior, lower_bound~ : Bool)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ConstraintEvidence::equal(Self, Self) -> Bool
 #deprecated
@@ -51,12 +54,13 @@ pub fn ConstraintEvidence::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ConstraintEvidence::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct ConstraintSet {
   clocks : ReadOnlyArray[String]
   constraints : ReadOnlyArray[BuiltConstraint]
   correlation : @correlate.CorrelationReport
   relation_tolerance_us : Int64
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ConstraintSet::equal(Self, Self) -> Bool
 #deprecated
@@ -64,13 +68,14 @@ pub fn ConstraintSet::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ConstraintSet::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct OffsetPrior {
   clock_id : String
   reference_clock : String
   lower_us : Int64?
   upper_us : Int64?
   label : String
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn OffsetPrior::equal(Self, Self) -> Bool
 pub fn OffsetPrior::new(clock_id~ : String, reference_clock~ : String, label~ : String, lower_us? : Int64, upper_us? : Int64) -> Self raise ConstraintBuildError

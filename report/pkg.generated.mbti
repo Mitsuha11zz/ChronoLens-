@@ -7,6 +7,7 @@ import {
   "Mitsuha11zz/chronolens/input",
   "Mitsuha11zz/chronolens/solver",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -17,10 +18,11 @@ pub fn from_failure(PipelineFailure, input? : @input.InputReport) -> DiagnosticR
 pub fn from_input(@input.InputReport) -> DiagnosticReport
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror ReportError {
   InvalidInputReport
   MismatchedInputEvents
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn ReportError::equal(Self, Self) -> Bool
 #deprecated
@@ -33,15 +35,16 @@ pub struct DiagnosticReport {
   // private fields
 }
 pub fn DiagnosticReport::stringify(Self, pretty? : Bool) -> String
-pub fn DiagnosticReport::to_json(Self) -> Json
+pub fn DiagnosticReport::to_json(Self) -> @json.Json
 pub fn DiagnosticReport::to_markdown(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) enum PipelineFailure {
   InputConfiguration(@input.InputConfigError)
   Correlation(@correlate.CorrelationError)
   ConstraintBuild(@constraints.ConstraintBuildError)
   Solver(@solver.SolveError)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn PipelineFailure::equal(Self, Self) -> Bool
 #deprecated

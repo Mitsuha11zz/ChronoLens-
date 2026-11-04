@@ -8,17 +8,18 @@ import {
 }
 
 // Values
-pub fn correlate(ArrayView[@model.Event], max_events? : Int) -> CorrelationReport raise CorrelationError
+pub fn correlate(ArrayView[@model.Event], max_events? : Int32) -> CorrelationReport raise CorrelationError
 
-pub fn correlate_input(@input.InputReport, max_events? : Int) -> CorrelationReport raise CorrelationError
+pub fn correlate_input(@input.InputReport, max_events? : Int32) -> CorrelationReport raise CorrelationError
 
 // Errors
+#derive(Eq, @debug.Debug)
 pub(all) suberror CorrelationError {
   InvalidInput
   InvalidEventLimit
-  EventLimitExceeded(limit~ : Int, count~ : Int)
+  EventLimitExceeded(limit~ : Int32, count~ : Int32)
   DuplicateEventId(String)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn CorrelationError::equal(Self, Self) -> Bool
 #deprecated
@@ -27,11 +28,12 @@ pub fn CorrelationError::not_equal(Self, Self) -> Bool
 pub fn CorrelationError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum CorrelationIssueKind {
   MissingSend
   MissingReceive
   Ambiguous
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn CorrelationIssueKind::equal(Self, Self) -> Bool
 #deprecated
@@ -39,11 +41,12 @@ pub fn CorrelationIssueKind::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn CorrelationIssueKind::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct CorrelationReport {
   pairs : ReadOnlyArray[MessagePair]
   unresolved : ReadOnlyArray[UnresolvedGroup]
   stats : CorrelationStats
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn CorrelationReport::equal(Self, Self) -> Bool
 pub fn CorrelationReport::fully_paired(Self) -> Bool
@@ -52,14 +55,15 @@ pub fn CorrelationReport::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn CorrelationReport::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct CorrelationStats {
-  total_events : Int
-  group_count : Int
-  paired_groups : Int
-  unresolved_groups : Int
-  missing_groups : Int
-  ambiguous_groups : Int
-} derive(Eq, @debug.Debug)
+  total_events : Int32
+  group_count : Int32
+  paired_groups : Int32
+  unresolved_groups : Int32
+  missing_groups : Int32
+  ambiguous_groups : Int32
+}
 #deprecated
 pub fn CorrelationStats::equal(Self, Self) -> Bool
 #deprecated
@@ -67,11 +71,12 @@ pub fn CorrelationStats::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn CorrelationStats::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct MessagePair {
   key : @model.MessageKey
   send_event : @model.Event
   receive_event : @model.Event
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn MessagePair::equal(Self, Self) -> Bool
 #deprecated
@@ -79,12 +84,13 @@ pub fn MessagePair::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn MessagePair::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct UnresolvedGroup {
   key : @model.MessageKey
   send_events : ReadOnlyArray[@model.Event]
   receive_events : ReadOnlyArray[@model.Event]
   issues : ReadOnlyArray[CorrelationIssueKind]
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn UnresolvedGroup::equal(Self, Self) -> Bool
 #deprecated

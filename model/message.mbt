@@ -20,18 +20,20 @@ pub extend MessageKey with Hash::{hash, hash_combine}
 
 ///|
 /// Direction of a single, explicitly identified message event.
+#derive(Debug, Eq)
 pub(all) enum EventKind {
   Send
   Receive
-} derive(Debug, Eq)
+}
 
 ///|
 /// A message attempt is identified by all three fields.
+#derive(Debug, Eq, Hash)
 pub struct MessageKey {
   trace_id : String
   message_id : String
   attempt : Int
-} derive(Debug, Eq, Hash)
+}
 
 ///|
 /// Validate identifiers and retry index without normalizing identifier text.

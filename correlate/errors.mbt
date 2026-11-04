@@ -1,10 +1,11 @@
 ///|
+#derive(Debug, Eq)
 pub(all) suberror CorrelationError {
   InvalidInput
   InvalidEventLimit
   EventLimitExceeded(limit~ : Int, count~ : Int)
   DuplicateEventId(String)
-} derive(Debug, Eq)
+}
 
 ///|
 #deprecated
