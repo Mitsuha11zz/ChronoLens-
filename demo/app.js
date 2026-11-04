@@ -9,6 +9,11 @@ const ui = {
   sourceName: byId("source-name"),
   tolerance: byId("tolerance-input"),
   reference: byId("reference-input"),
+  priorEditor: byId("prior-editor"),
+  priorList: byId("prior-list"),
+  priorCount: byId("prior-count"),
+  addPrior: byId("add-prior-button"),
+  priorExample: byId("prior-example-button"),
   analyze: byId("analyze-button"),
   export: byId("export-button"),
   empty: byId("empty-state"),
@@ -19,6 +24,8 @@ const ui = {
   verdictCopy: byId("verdict-copy"),
   verdictMark: byId("verdict-mark"),
   metrics: byId("metric-strip"),
+  appliedPriorsSection: byId("applied-priors-section"),
+  appliedPriors: byId("applied-priors-list"),
   components: byId("component-grid"),
   timeline: byId("timeline-stack"),
   evidence: byId("evidence-list"),
@@ -27,6 +34,10 @@ const ui = {
   raw: byId("raw-json"),
   toast: byId("toast"),
 };
+
+const MAX_PRIOR_ROWS = 64;
+const INT64_MIN = -(1n << 63n);
+const INT64_MAX = (1n << 63n) - 1n;
 
 const state = {
   report: null,
@@ -64,9 +75,142 @@ async function loadSample(sampleId) {
     ui.input.value = result.jsonl;
     ui.sourceName.textContent = `内置样例 · ${result.label}`;
     updateLineCount();
+    return true;
   } catch (error) {
     showToast(error.message || "无法载入内置样例。", "is-error");
+    return false;
   }
+}
+
+function updatePriorCount() {
+  const count = ui.priorList.querySelectorAll("[data-prior-row]").length;
+  ui.priorCount.textContent = `${count} 条`;
+  ui.addPrior.disabled = count >= MAX_PRIOR_ROWS;
+}
+
+function priorField(label, name, placeholder, wide = false) {
+  const field = element("label", `prior-field${wide ? " is-wide" : ""}`);
+  field.append(element("span", "", label));
+  const input = document.createElement("input");
+  input.type = "text";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.maxLength = name === "label" || name === "clock_id" || name === "reference_clock" ? 4096 : 20;
+  input.inputMode = name.endsWith("_us") ? "decimal" : "text";
+  input.placeholder = placeholder;
+  input.dataset.priorField = name;
+  field.append(input);
+  return field;
+}
+
+function addPriorRow(values = {}) {
+  const current = ui.priorList.querySelectorAll("[data-prior-row]").length;
+  if (current >= MAX_PRIOR_ROWS) {
+    showToast(`最多添加 ${MAX_PRIOR_ROWS} 条先验。`, "is-error");
+    return null;
+  }
+
+  const card = element("article", "prior-card");
+  card.dataset.priorRow = "";
+  const head = element("div", "prior-card-head");
+  head.append(element("span", "prior-card-index", `BOUND / ${String(current + 1).padStart(2, "0")}`));
+  const remove = element("button", "remove-prior", "×");
+  remove.type = "button";
+  remove.setAttribute("aria-label", `删除第 ${current + 1} 条先验`);
+  remove.addEventListener("click", () => {
+    card.remove();
+    updatePriorCount();
+  });
+  head.append(remove);
+  card.append(head);
+
+  const fields = element("div", "prior-fields");
+  const clock = priorField("目标时钟", "clock_id", "例如 B");
+  const reference = priorField("参考时钟", "reference_clock", "例如 A");
+  const label = priorField("证据标签", "label", "例如 calibration-window", true);
+  const lower = priorField("偏移下界", "lower_us", "可留空 · −∞");
+  const upper = priorField("偏移上界", "upper_us", "可留空 · +∞");
+  for (const [field, name] of [
+    [clock, "clock_id"],
+    [reference, "reference_clock"],
+    [label, "label"],
+    [lower, "lower_us"],
+    [upper, "upper_us"],
+  ]) {
+    const input = field.querySelector("input");
+    input.value = values[name] ?? "";
+  }
+  fields.append(clock, reference, label, lower, upper);
+  card.append(fields);
+  ui.priorList.append(card);
+  updatePriorCount();
+  return card;
+}
+
+function collectPriors() {
+  const priors = [];
+  const labels = new Set();
+  const rows = ui.priorList.querySelectorAll("[data-prior-row]");
+  for (const [index, row] of Array.from(rows).entries()) {
+    const value = (name) => row.querySelector(`[data-prior-field="${name}"]`).value.trim();
+    const clockId = value("clock_id");
+    const referenceClock = value("reference_clock");
+    const label = value("label");
+    if (!clockId || !referenceClock || !label) {
+      throw new Error(`第 ${index + 1} 条先验需要填写目标时钟、参考时钟和标签。`);
+    }
+    if (labels.has(label)) throw new Error(`先验标签必须唯一：${label}。`);
+    labels.add(label);
+
+    const readBound = (name) => {
+      const raw = value(name);
+      if (!raw) return null;
+      if (!/^-?(?:0|[1-9][0-9]*)$/.test(raw)) {
+        throw new Error(`${name} 必须是十进制 Int64 整数。`);
+      }
+      let parsed;
+      try {
+        parsed = BigInt(raw);
+      } catch {
+        throw new Error(`${name} 不是有效的 Int64 整数。`);
+      }
+      if (parsed < INT64_MIN || parsed > INT64_MAX) {
+        throw new Error(`${name} 超出 Int64 范围。`);
+      }
+      return raw;
+    };
+    const lower = readBound("lower_us");
+    const upper = readBound("upper_us");
+    if (lower === null && upper === null) {
+      throw new Error(`第 ${index + 1} 条先验至少要填写一个边界。`);
+    }
+    if (lower !== null && upper !== null && BigInt(lower) > BigInt(upper)) {
+      throw new Error(`第 ${index + 1} 条先验的下界不能大于上界。`);
+    }
+    priors.push({
+      clock_id: clockId,
+      reference_clock: referenceClock,
+      label,
+      lower_us: lower,
+      upper_us: upper,
+    });
+  }
+  return priors;
+}
+
+async function loadPriorExample() {
+  ui.sample.value = "four-events";
+  if (!await loadSample("four-events")) return;
+  ui.priorList.replaceChildren();
+  addPriorRow({
+    clock_id: "B",
+    reference_clock: "A",
+    label: "calibration-window",
+    lower_us: "120000",
+    upper_us: "150000",
+  });
+  ui.priorEditor.open = true;
+  showToast("已载入四事件样例与相对偏移范围。");
 }
 
 function acceptFile(file) {
@@ -172,6 +316,25 @@ function renderVerdict(report) {
   ui.verdictTitle.textContent = presentation.title;
   ui.verdictCopy.textContent = presentation.copy;
   ui.verdictMark.textContent = presentation.mark;
+}
+
+function renderAppliedPriors(report) {
+  const priors = report.model?.priors || [];
+  ui.appliedPriors.replaceChildren();
+  ui.appliedPriorsSection.hidden = priors.length === 0;
+  for (const prior of priors) {
+    const row = element("div", "applied-prior-row");
+    row.append(element(
+      "strong",
+      "applied-prior-clocks",
+      `offset(${prior.clock_id}) − offset(${prior.reference_clock})`,
+    ));
+    const lower = prior.lower_us === null ? "−∞" : formatInteger(prior.lower_us);
+    const upper = prior.upper_us === null ? "+∞" : formatInteger(prior.upper_us);
+    row.append(element("span", "applied-prior-range", `${lower} … ${upper} µs`));
+    row.append(element("span", "applied-prior-label", prior.label));
+    ui.appliedPriors.append(row);
+  }
 }
 
 function renderMetrics(report) {
@@ -414,8 +577,9 @@ function renderEvidence(report) {
           const key = evidence.key;
           sources.append(element("span", "message-key", `${key.trace_id} / ${key.message_id} / #${key.attempt}`));
         }
-      } else if (evidence.prior?.label) {
-        sources.append(element("span", "message-key", `先验 · ${evidence.prior.label}`));
+      } else if (evidence.kind === "prior" || evidence.prior_label) {
+        const bound = evidence.bound ? ` · ${evidence.bound}` : "";
+        sources.append(element("span", "message-key", `先验 · ${evidence.prior_label || evidence.prior?.label}${bound}`));
       }
       sources.append(element("span", "edge-index", `边 ${index}`));
       row.append(sources);
@@ -512,6 +676,7 @@ function renderReport(report) {
   ui.view.hidden = false;
   renderVerdict(report);
   renderMetrics(report);
+  renderAppliedPriors(report);
   renderComponents(report);
   renderTimeline(report);
   renderEvidence(report);
@@ -534,6 +699,14 @@ async function runAnalysis() {
     ui.tolerance.focus();
     return;
   }
+  let priors;
+  try {
+    priors = collectPriors();
+  } catch (error) {
+    showToast(error.message || "相对偏移先验无效。", "is-error");
+    ui.priorEditor.open = true;
+    return;
+  }
 
   ui.analyze.disabled = true;
   ui.analyze.classList.add("is-running");
@@ -547,6 +720,7 @@ async function runAnalysis() {
         jsonl,
         relation_tolerance_us: tolerance,
         reference_clock: ui.reference.value.trim(),
+        priors,
       }),
     });
     const result = await response.json();
@@ -586,6 +760,11 @@ function exportReport() {
 ui.sample.addEventListener("change", () => {
   if (ui.sample.value) loadSample(ui.sample.value);
 });
+ui.addPrior.addEventListener("click", () => {
+  ui.priorEditor.open = true;
+  addPriorRow();
+});
+ui.priorExample.addEventListener("click", loadPriorExample);
 ui.file.addEventListener("change", () => acceptFile(ui.file.files?.[0]));
 ui.input.addEventListener("input", updateLineCount);
 ui.analyze.addEventListener("click", runAnalysis);
@@ -605,4 +784,5 @@ ui.dropzone.addEventListener("drop", (event) => {
 });
 
 updateLineCount();
+updatePriorCount();
 loadSample(ui.sample.value);

@@ -17,8 +17,12 @@ from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DEMO = Path(__file__).resolve().parent
-MAX_BODY_BYTES = 8 * 1024 * 1024 + 64 * 1024
+MAX_INPUT_BYTES = 8 * 1024 * 1024
+MAX_PRIOR_FILE_BYTES = 1024 * 1024
+MAX_BODY_BYTES = MAX_INPUT_BYTES * 2 + MAX_PRIOR_FILE_BYTES + 64 * 1024
 MAX_REFERENCE_CLOCK_CHARS = 4096
+MAX_PRIORS = 64
+MAX_PRIOR_TEXT_CHARS = 4096
 ANALYSIS_TIMEOUT_SECONDS = 120
 ANALYSIS_LOCK = threading.Lock()
 
@@ -83,6 +87,75 @@ def decimal_nonnegative(value: object) -> str | None:
     if len(text) > 19 or (len(text) == 19 and text > "9223372036854775807"):
         return None
     return text
+
+
+def decimal_int64(value: object) -> str | None:
+    if not isinstance(value, str) or not re.fullmatch(r"-?(?:0|[1-9][0-9]*)", value):
+        return None
+    if len(value) > 20:
+        return None
+    parsed = int(value)
+    if parsed < -(1 << 63) or parsed > (1 << 63) - 1:
+        return None
+    return value
+
+
+def validate_priors(value: object) -> tuple[list[dict[str, str | None]], str | None]:
+    if value is None:
+        return [], None
+    if not isinstance(value, list):
+        return [], "相对偏移先验必须是数组。"
+    if len(value) > MAX_PRIORS:
+        return [], f"单次演示最多接受 {MAX_PRIORS} 条先验。"
+
+    allowed_fields = {"clock_id", "reference_clock", "label", "lower_us", "upper_us"}
+    labels: set[str] = set()
+    priors: list[dict[str, str | None]] = []
+    for index, item in enumerate(value, start=1):
+        if not isinstance(item, dict):
+            return [], f"第 {index} 条先验必须是对象。"
+        unknown = set(item) - allowed_fields
+        if unknown:
+            return [], f"第 {index} 条先验包含未知字段：{sorted(unknown)[0]}。"
+
+        text_fields: dict[str, str] = {}
+        for name in ("clock_id", "reference_clock", "label"):
+            raw = item.get(name)
+            if not isinstance(raw, str):
+                return [], f"第 {index} 条先验缺少文本字段 {name}。"
+            cleaned = raw.strip()
+            if not cleaned or len(cleaned) > MAX_PRIOR_TEXT_CHARS:
+                return [], f"第 {index} 条先验的 {name} 为空或过长。"
+            text_fields[name] = cleaned
+
+        label = text_fields["label"]
+        if label in labels:
+            return [], f"先验标签必须唯一：{label}。"
+        labels.add(label)
+
+        bounds: dict[str, str | None] = {}
+        for name in ("lower_us", "upper_us"):
+            raw = item.get(name)
+            if raw is None:
+                bounds[name] = None
+                continue
+            parsed = decimal_int64(raw)
+            if parsed is None:
+                return [], f"第 {index} 条先验的 {name} 必须是十进制 Int64 字符串。"
+            bounds[name] = parsed
+
+        lower = bounds["lower_us"]
+        upper = bounds["upper_us"]
+        if lower is None and upper is None:
+            return [], f"第 {index} 条先验至少要设置一个边界。"
+        if lower is not None and upper is not None and int(lower) > int(upper):
+            return [], f"第 {index} 条先验的下界不能大于上界。"
+
+        priors.append({**text_fields, **bounds})
+    serialized_size = len(json.dumps(priors, ensure_ascii=False).encode("utf-8"))
+    if serialized_size > MAX_PRIOR_FILE_BYTES:
+        return [], "先验数据超过 CLI 的 1 MiB 文件限制。"
+    return priors, None
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -163,7 +236,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "请求长度无效。"}, 400)
             return
         if length < 0 or length > MAX_BODY_BYTES:
-            self.send_json({"error": "请求超过本地演示服务的 8 MiB 输入上限。"}, 413)
+            self.send_json({"error": "请求超过本地演示服务的大小限制。"}, 413)
             return
 
         try:
@@ -185,13 +258,18 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "参考时钟标识无效或过长。"}, 400)
             return
 
+        priors, prior_error = validate_priors(payload.get("priors", []))
+        if prior_error is not None:
+            self.send_json({"error": prior_error}, 400)
+            return
+
         if ENGINE is None:
             self.send_json({"error": "MoonBit CLI 尚未准备好。"}, 503)
             return
 
         try:
             response = self.run_analysis(
-                payload["jsonl"], tolerance, reference_clock.strip()
+                payload["jsonl"], tolerance, reference_clock.strip(), priors
             )
         except subprocess.TimeoutExpired:
             self.send_json({"error": "分析超过 120 秒，已停止本次请求。"}, 504)
@@ -203,7 +281,11 @@ class Handler(BaseHTTPRequestHandler):
         self.send_json(response)
 
     def run_analysis(
-        self, jsonl: str, tolerance: str, reference_clock: str
+        self,
+        jsonl: str,
+        tolerance: str,
+        reference_clock: str,
+        priors: list[dict[str, str | None]],
     ) -> dict[str, object]:
         assert ENGINE is not None
         with tempfile.TemporaryDirectory(prefix="chronolens-demo-") as temp_dir:
@@ -219,6 +301,12 @@ class Handler(BaseHTTPRequestHandler):
             ]
             if reference_clock:
                 arguments.extend(["--reference-clock", reference_clock])
+            if priors:
+                priors_path = Path(temp_dir) / "priors.json"
+                priors_path.write_bytes(
+                    json.dumps(priors, ensure_ascii=False).encode("utf-8")
+                )
+                arguments.extend(["--priors-file", priors_path.name])
 
             with ANALYSIS_LOCK:
                 completed = subprocess.run(

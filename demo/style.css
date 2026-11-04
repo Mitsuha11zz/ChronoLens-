@@ -206,6 +206,35 @@ a:focus-visible, summary:focus-visible, .dropzone:focus-within {
 .setting-field small { color: var(--faint); font-size: 9px; }
 .setting-field input { min-height: 36px; padding: 0 9px; font: 11px var(--mono); }
 .assumption-note { margin: 10px 0 0; color: var(--faint); font-size: 10px; }
+.prior-editor { margin-top: 15px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.prior-editor summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 1px; color: var(--ink-soft); font-size: 11px; cursor: pointer; list-style: none; }
+.prior-editor summary::-webkit-details-marker { display: none; }
+.prior-editor summary::after { content: "+"; order: 1; color: var(--acid); font: 16px/1 var(--mono); }
+.prior-editor[open] summary::after { content: "−"; }
+.prior-editor summary > span:first-child { display: flex; align-items: center; gap: 8px; }
+.prior-editor summary small { color: var(--acid-dim); font: 8px var(--mono); letter-spacing: .08em; }
+#prior-count { margin-left: auto; color: var(--faint); font: 9px var(--mono); }
+.prior-editor-body { padding: 0 0 11px; }
+.prior-help, .prior-limit { margin: 0; color: var(--faint); font-size: 9px; line-height: 1.65; }
+.prior-actions { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0; }
+.minor-button { min-height: 29px; padding: 0 9px; border: 1px solid var(--line-bright); background: transparent; color: var(--ink-soft); font-size: 9px; cursor: pointer; transition: border-color .16s ease, color .16s ease, background .16s ease; }
+.minor-button:hover { border-color: var(--acid-dim); color: var(--acid); }
+.minor-button.is-accent { border-color: rgb(214 239 121 / 38%); color: var(--acid); }
+.minor-button.is-accent:hover { background: rgb(214 239 121 / 8%); }
+.prior-list { display: grid; gap: 8px; }
+.prior-card { padding: 10px; border-left: 2px solid var(--acid-dim); background: #141812; }
+.prior-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+.prior-card-index { color: var(--acid-dim); font: 8px var(--mono); letter-spacing: .1em; }
+.remove-prior { width: 25px; height: 24px; border: 1px solid var(--line); background: transparent; color: var(--muted); font: 13px/1 var(--mono); cursor: pointer; }
+.remove-prior:hover { border-color: var(--red); color: var(--red); }
+.prior-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 8px; }
+.prior-field { min-width: 0; display: grid; gap: 5px; color: var(--muted); font-size: 9px; }
+.prior-field.is-wide { grid-column: 1 / -1; }
+.prior-field > span { display: flex; justify-content: space-between; gap: 5px; }
+.prior-field small { color: var(--faint); font-size: 8px; }
+.prior-field input { width: 100%; min-width: 0; height: 32px; padding: 0 8px; border: 1px solid var(--line-bright); border-radius: 0; background: #10130f; color: var(--ink); font: 10px var(--mono); }
+.prior-field input::placeholder { color: #62695c; }
+.prior-limit { margin-top: 9px; font: 8px var(--mono); }
 
 .analyze-button {
   width: 100%;
@@ -291,6 +320,11 @@ a:focus-visible, summary:focus-visible, .dropzone:focus-within {
 .result-heading { align-items: end; gap: 16px; margin-bottom: 17px; }
 .result-heading h3 { margin: 6px 0 0; font: 500 21px/1.2 var(--display); letter-spacing: -.02em; }
 .heading-side-note { color: var(--faint); font-size: 10px; text-align: right; }
+.applied-priors-list { display: grid; gap: 8px; }
+.applied-prior-row { display: grid; grid-template-columns: minmax(140px, .8fr) minmax(180px, 1.2fr) minmax(120px, .7fr); gap: 12px; align-items: center; padding: 11px 13px; border-left: 2px solid var(--acid-dim); background: #1b2019; }
+.applied-prior-clocks { color: var(--ink-soft); font: 10px var(--mono); overflow-wrap: anywhere; }
+.applied-prior-range { color: var(--acid); font: 10px var(--mono); }
+.applied-prior-label { justify-self: end; color: var(--faint); font-size: 9px; overflow-wrap: anywhere; }
 .component-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 10px; }
 .component-card { min-width: 0; padding: 15px; border: 1px solid var(--line); background: #1b2019; }
 .component-card.status-infeasible { border-color: rgb(241 123 112 / 30%); }
@@ -433,6 +467,8 @@ a:focus-visible, summary:focus-visible, .dropzone:focus-within {
   .inspector-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .page-footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 5px; padding: 11px 0; font-size: 7px; }
   .toast { right: 12px; bottom: 12px; }
+  .applied-prior-row { grid-template-columns: 1fr; gap: 6px; }
+  .applied-prior-label { justify-self: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

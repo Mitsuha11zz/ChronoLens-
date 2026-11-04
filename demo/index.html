@@ -101,7 +101,22 @@
                   <input id="reference-input" type="text" maxlength="4096" placeholder="自动选择">
                 </label>
               </div>
-              <p class="assumption-note">固定偏移模型 · 无先验时不补造约束</p>
+              <details class="prior-editor" id="prior-editor" open>
+                <summary>
+                  <span>相对偏移先验 <small>RELATIVE / µs</small></span>
+                  <span id="prior-count">0 条</span>
+                </summary>
+                <div class="prior-editor-body">
+                  <p class="prior-help">给两个时钟之间的偏移差设定已知范围。先验是分析假设，不代表 UTC 校准。</p>
+                  <div class="prior-actions">
+                    <button class="minor-button" id="prior-example-button" type="button">载入配套示例</button>
+                    <button class="minor-button is-accent" id="add-prior-button" type="button">＋ 添加范围</button>
+                  </div>
+                  <div class="prior-list" id="prior-list" aria-live="polite"></div>
+                  <p class="prior-limit">最多 64 条 · 边界使用 Int64 微秒</p>
+                </div>
+              </details>
+              <p class="assumption-note">固定偏移模型 · 未添加先验时只使用消息约束</p>
             </div>
 
             <button class="analyze-button" id="analyze-button" type="button">
@@ -149,9 +164,17 @@
 
               <div class="metric-strip" id="metric-strip"></div>
 
+              <section class="result-section applied-priors" id="applied-priors-section" hidden aria-label="已应用的相对偏移先验">
+                <div class="result-heading">
+                  <div><span class="section-index">04 <i></i> PRIOR INPUT</span><h3>采用的先验范围</h3></div>
+                  <span class="heading-side-note">相对偏移假设 · µs</span>
+                </div>
+                <div class="applied-priors-list" id="applied-priors-list"></div>
+              </section>
+
               <section class="result-section">
                 <div class="result-heading">
-                  <div><span class="section-index">04 <i></i> COMPONENTS</span><h3>偏移可行范围</h3></div>
+                  <div><span class="section-index">05 <i></i> COMPONENTS</span><h3>偏移可行范围</h3></div>
                   <span class="heading-side-note">分量使用独立参考坐标</span>
                 </div>
                 <div class="component-grid" id="component-grid"></div>
@@ -159,7 +182,7 @@
 
               <section class="result-section timeline-section">
                 <div class="result-heading">
-                  <div><span class="section-index">05 <i></i> REPRESENTATIVE</span><h3>一组代表时间线</h3></div>
+                  <div><span class="section-index">06 <i></i> REPRESENTATIVE</span><h3>一组代表时间线</h3></div>
                   <span class="heading-side-note">不是 UTC · 分量间不可比较</span>
                 </div>
                 <p class="section-explainer">使用求解器返回的同一组可行偏移，将事件放入各自分量的参考坐标。横向位置只在同一分量内有意义。</p>
@@ -168,7 +191,7 @@
 
               <section class="result-section evidence-section">
                 <div class="result-heading">
-                  <div><span class="section-index">06 <i></i> WITNESS</span><h3>冲突证据</h3></div>
+                  <div><span class="section-index">07 <i></i> WITNESS</span><h3>冲突证据</h3></div>
                   <span class="heading-side-note">点击事件可查看原始记录</span>
                 </div>
                 <div class="evidence-list" id="evidence-list"></div>
@@ -176,7 +199,7 @@
 
               <section class="result-section event-section">
                 <div class="result-heading">
-                  <div><span class="section-index">07 <i></i> EVENTS</span><h3>原始事件</h3></div>
+                  <div><span class="section-index">08 <i></i> EVENTS</span><h3>原始事件</h3></div>
                   <span class="heading-side-note">按时钟分组 · 保留输入观测值</span>
                 </div>
                 <div class="event-inspector" id="event-inspector">

@@ -270,3 +270,9 @@ JSONL 和 typed-event 两个根包入口新增可选 `priors` 参数，接受约
 正式 CLI 新增 `--priors-file`，可从 JSON 数组加载时钟相对偏移边界并传入根包分析 API。文件解析要求唯一先验标签、明确字段和十进制字符串 Int64；拒绝重复 JSON 字段、未知字段、无效范围及超限文件。上限为 1 MiB、4096 条先验，并阻止输出路径覆盖输入或先验文件。新增 `fixtures/offset-priors.json`，可将现有双服务样例的 B-A 偏移范围约束到 120,000–150,000 微秒。
 
 验证：`moon fmt cmd/chronolens`、`moon check --target native --deny-warn` 和 `moon build cmd/chronolens --target native --deny-warn` 通过。遵循本阶段范围，未新增或运行测试套件；CLI 的实际文件读取与报告输出行为尚未做运行时验证。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-04：演示工作台相对偏移先验
+
+本地工作台新增可增删的相对偏移先验编辑器，可填写目标时钟、参考时钟、唯一标签和单侧／双侧 Int64 微秒边界；提供与四事件样例配套的先验按钮。服务端校验先验数量、字段、标签、数值范围和边界顺序，在临时目录生成先验 JSON 后调用正式 CLI。分析结果增加已应用先验摘要，明确显示 `offset(clock) - offset(reference)` 的范围。所有请求文件在分析后由临时目录清理。
+
+验证：先用 `fixtures/four-events.jsonl` 与 `fixtures/offset-priors.json` 调用 CLI，报告状态为 `feasible`，B-A 边际区间为 120,000–150,000 微秒，先验证据出现在报告中。`python -m py_compile demo/server.py`、`node --check demo/app.js` 和 `git diff --check` 通过。未新增或运行测试套件，也未进行浏览器交互验收。当前改动未提交、未推送，完成后停止等待用户确认。
