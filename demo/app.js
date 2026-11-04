@@ -17,6 +17,8 @@ const ui = {
   exportPriors: byId("export-priors-button"),
   importPriors: byId("import-priors-button"),
   importPriorsFile: byId("import-priors-file"),
+  clearPriors: byId("clear-priors-button"),
+  undoClearPriors: byId("undo-clear-priors-button"),
   analyze: byId("analyze-button"),
   export: byId("export-button"),
   empty: byId("empty-state"),
@@ -46,6 +48,7 @@ const state = {
   report: null,
   selectedEventId: null,
   toastTimer: null,
+  clearedPriors: null,
 };
 
 function element(tag, className = "", text = null) {
@@ -90,6 +93,8 @@ function updatePriorCount() {
   ui.priorCount.textContent = `${count} 条`;
   ui.addPrior.disabled = count >= MAX_PRIOR_ROWS;
   ui.exportPriors.disabled = count === 0;
+  ui.clearPriors.disabled = count === 0;
+  ui.undoClearPriors.hidden = count !== 0 || state.clearedPriors === null;
 }
 
 function priorField(label, name, placeholder, wide = false) {
@@ -159,6 +164,25 @@ function readPriorRows() {
       name, row.querySelector(`[data-prior-field="${name}"]`).value,
     ])),
   );
+}
+
+function clearPriors() {
+  const rows = readPriorRows();
+  if (rows.length === 0) return;
+  state.clearedPriors = rows;
+  ui.priorList.replaceChildren();
+  updatePriorCount();
+  ui.undoClearPriors.focus();
+  showToast(`已清空 ${rows.length} 条先验，下次分析将使用当前编辑区的配置。`);
+}
+
+function undoClearPriors() {
+  if (ui.priorList.childElementCount !== 0 || state.clearedPriors === null) return;
+  const rows = state.clearedPriors;
+  state.clearedPriors = null;
+  for (const row of rows) addPriorRow(row);
+  ui.clearPriors.focus();
+  showToast(`已恢复 ${rows.length} 条先验。`);
 }
 
 function validatePriors(rows, labels = new Set()) {
@@ -833,6 +857,8 @@ ui.addPrior.addEventListener("click", () => {
 ui.priorExample.addEventListener("click", loadPriorExample);
 ui.exportPriors.addEventListener("click", exportPriors);
 ui.importPriors.addEventListener("click", () => ui.importPriorsFile.click());
+ui.clearPriors.addEventListener("click", clearPriors);
+ui.undoClearPriors.addEventListener("click", undoClearPriors);
 ui.importPriorsFile.addEventListener("change", () => {
   const file = ui.importPriorsFile.files?.[0];
   ui.importPriorsFile.value = "";
