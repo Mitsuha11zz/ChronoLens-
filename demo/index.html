@@ -138,8 +138,10 @@
               <button class="export-button" id="export-button" type="button" disabled>
                 <span aria-hidden="true">↓</span> 导出 JSON
               </button>
+              <button class="export-button" id="export-markdown-button" type="button" disabled>↓ 导出 Markdown</button>
             </div>
 
+            <p class="stale-report" id="stale-report" role="status" hidden>配置已变更。下方报告和导出 JSON 对应上次分析，请重新运行分析以更新结果。</p>
             <div class="empty-state" id="empty-state">
               <div class="empty-art" aria-hidden="true">
                 <span class="empty-ring ring-one"></span>
@@ -210,6 +212,11 @@
                 <div class="event-inspector" id="event-inspector">
                   <span class="inspector-placeholder">选择一条事件或证据查看字段</span>
                 </div>
+                <label class="event-search">
+                  <span>查找事件</span>
+                  <input id="event-search" type="search" placeholder="事件 ID、时钟、trace_id 或 message_id" autocomplete="off">
+                  <span id="event-search-count" role="status"></span>
+                </label>
                 <div class="event-list" id="event-list"></div>
               </section>
 

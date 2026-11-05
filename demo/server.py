@@ -263,13 +263,18 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": prior_error}, 400)
             return
 
+        report_format = payload.get("format", "json")
+        if report_format not in ("json", "markdown"):
+            self.send_json({"error": "报告格式必须是 json 或 markdown。"}, 400)
+            return
+
         if ENGINE is None:
             self.send_json({"error": "MoonBit CLI 尚未准备好。"}, 503)
             return
 
         try:
             response = self.run_analysis(
-                payload["jsonl"], tolerance, reference_clock.strip(), priors
+                payload["jsonl"], tolerance, reference_clock.strip(), priors, report_format
             )
         except subprocess.TimeoutExpired:
             self.send_json({"error": "分析超过 120 秒，已停止本次请求。"}, 504)
@@ -286,6 +291,7 @@ class Handler(BaseHTTPRequestHandler):
         tolerance: str,
         reference_clock: str,
         priors: list[dict[str, str | None]],
+        report_format: str = "json",
     ) -> dict[str, object]:
         assert ENGINE is not None
         with tempfile.TemporaryDirectory(prefix="chronolens-demo-") as temp_dir:
@@ -295,7 +301,7 @@ class Handler(BaseHTTPRequestHandler):
                 str(ENGINE),
                 "events.jsonl",
                 "--format",
-                "json",
+                report_format,
                 "--relation-tolerance-us",
                 tolerance,
             ]
@@ -320,6 +326,14 @@ class Handler(BaseHTTPRequestHandler):
                     check=False,
                 )
 
+        if completed.returncode not in (0, 1, 4, 5):
+            detail = completed.stderr.strip() or f"MoonBit CLI 退出码：{completed.returncode}"
+            raise RuntimeError(detail)
+        if report_format == "markdown":
+            if not completed.stdout.strip():
+                raise RuntimeError("MoonBit CLI 没有返回 Markdown 报告。")
+            return {"exit_code": completed.returncode, "markdown": completed.stdout}
+
         try:
             report = json.loads(completed.stdout)
         except json.JSONDecodeError as error:
@@ -327,9 +341,6 @@ class Handler(BaseHTTPRequestHandler):
             raise RuntimeError(detail) from error
         if not isinstance(report, dict):
             raise RuntimeError("MoonBit CLI 返回了非对象诊断报告。")
-        if completed.returncode not in (0, 1, 4, 5):
-            detail = completed.stderr.strip() or f"MoonBit CLI 退出码：{completed.returncode}"
-            raise RuntimeError(detail)
         return {"exit_code": completed.returncode, "report": report}
 
 

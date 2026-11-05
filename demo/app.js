@@ -21,6 +21,7 @@ const ui = {
   undoClearPriors: byId("undo-clear-priors-button"),
   analyze: byId("analyze-button"),
   export: byId("export-button"),
+  exportMarkdown: byId("export-markdown-button"),
   empty: byId("empty-state"),
   view: byId("report-view"),
   verdict: byId("verdict"),
@@ -36,8 +37,11 @@ const ui = {
   evidence: byId("evidence-list"),
   inspector: byId("event-inspector"),
   events: byId("event-list"),
+  eventSearch: byId("event-search"),
+  eventCount: byId("event-search-count"),
   raw: byId("raw-json"),
   toast: byId("toast"),
+  staleReport: byId("stale-report"),
 };
 
 const MAX_PRIOR_ROWS = 64;
@@ -49,6 +53,10 @@ const state = {
   selectedEventId: null,
   toastTimer: null,
   clearedPriors: null,
+  reportConfiguration: null,
+  eventPage: 0,
+  reportPayload: null,
+  markdownBusy: false,
 };
 
 function element(tag, className = "", text = null) {
@@ -71,6 +79,7 @@ function updateLineCount() {
   const value = ui.input.value;
   const rows = value.length === 0 ? 0 : value.replace(/\n$/, "").split(/\r\n|\r|\n/).length;
   ui.lineCount.textContent = `${rows.toLocaleString("zh-CN")} 行`;
+  updateReportFreshness();
 }
 
 async function loadSample(sampleId) {
@@ -95,6 +104,7 @@ function updatePriorCount() {
   ui.exportPriors.disabled = count === 0;
   ui.clearPriors.disabled = count === 0;
   ui.undoClearPriors.hidden = count !== 0 || state.clearedPriors === null;
+  updateReportFreshness();
 }
 
 function priorField(label, name, placeholder, wide = false) {
@@ -164,6 +174,20 @@ function readPriorRows() {
       name, row.querySelector(`[data-prior-field="${name}"]`).value,
     ])),
   );
+}
+
+function configurationSnapshot() {
+  return JSON.stringify({
+    jsonl: ui.input.value,
+    tolerance: ui.tolerance.value,
+    reference: ui.reference.value,
+    priors: readPriorRows(),
+  });
+}
+
+function updateReportFreshness() {
+  ui.staleReport.hidden = state.reportConfiguration === null ||
+    state.reportConfiguration === configurationSnapshot();
 }
 
 function clearPriors() {
@@ -695,6 +719,10 @@ function selectedEventMarkup(event) {
 function selectEvent(eventId, scrollToEvent = false) {
   state.selectedEventId = eventId;
   const event = (state.report?.events || []).find((item) => item.event_id === eventId);
+  if (scrollToEvent && event) {
+    ui.eventSearch.value = "";
+    renderEvents(state.report, eventId);
+  }
   selectedEventMarkup(event);
   for (const node of document.querySelectorAll("[data-event-id]")) {
     node.classList.toggle("is-selected", node.dataset.eventId === eventId);
@@ -703,15 +731,21 @@ function selectEvent(eventId, scrollToEvent = false) {
     const row = [...document.querySelectorAll("[data-event-id]")].find(
       (node) => node.dataset.eventId === eventId && node.classList.contains("event-row"),
     );
+    row?.focus({ preventScroll: true });
     row?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
 
-function renderEvents(report) {
+function renderEvents(report, revealEventId = null) {
   ui.events.replaceChildren();
-  const events = [...(report.events || [])];
+  const allEvents = report.events || [];
+  const query = ui.eventSearch.value.trim().toLowerCase();
+  const events = allEvents.filter((event) => !query ||
+    [event.event_id, event.clock_id, event.trace_id, event.message_id]
+      .some((value) => String(value ?? "").toLowerCase().includes(query)));
+  ui.eventCount.textContent = `${events.length} / ${allEvents.length} 条匹配`;
   if (events.length === 0) {
-    ui.events.append(element("div", "section-empty", "没有保留可展示的事件记录。"));
+    ui.events.append(element("div", "section-empty", query ? "没有匹配的事件，请调整搜索词。" : "没有保留可展示的事件记录。"));
     return;
   }
   events.sort((left, right) => {
@@ -723,7 +757,14 @@ function renderEvents(report) {
   });
 
   const maximumRows = 240;
-  for (const event of events.slice(0, maximumRows)) {
+  if (revealEventId !== null) {
+    const index = events.findIndex((event) => event.event_id === revealEventId);
+    if (index >= 0) state.eventPage = Math.floor(index / maximumRows);
+  }
+  const lastPage = Math.floor((events.length - 1) / maximumRows);
+  state.eventPage = Math.max(0, Math.min(state.eventPage, lastPage));
+  const start = state.eventPage * maximumRows;
+  for (const event of events.slice(start, start + maximumRows)) {
     const row = element("button", "event-row");
     row.type = "button";
     row.dataset.eventId = event.event_id;
@@ -736,7 +777,23 @@ function renderEvents(report) {
     ui.events.append(row);
   }
   if (events.length > maximumRows) {
-    ui.events.append(element("p", "event-cap", `显示前 ${maximumRows} / ${events.length} 条事件；完整数据保留在 JSON 导出中。`));
+    const navigation = element("nav", "event-search");
+    navigation.setAttribute("aria-label", "事件列表分页");
+    const previous = element("button", "minor-button", "上一页");
+    const next = element("button", "minor-button", "下一页");
+    previous.type = next.type = "button";
+    previous.disabled = state.eventPage === 0;
+    next.disabled = state.eventPage === lastPage;
+    const changePage = (delta) => {
+      state.eventPage += delta;
+      renderEvents(report);
+      ui.events.querySelector(".event-row")?.focus();
+    };
+    previous.addEventListener("click", () => changePage(-1));
+    next.addEventListener("click", () => changePage(1));
+    navigation.append(previous, element("span", "event-cap",
+      `第 ${start + 1}–${Math.min(start + maximumRows, events.length)} / ${events.length} 条`), next);
+    ui.events.append(navigation);
   }
   if (state.selectedEventId) selectEvent(state.selectedEventId);
 }
@@ -744,6 +801,8 @@ function renderEvents(report) {
 function renderReport(report) {
   state.report = report;
   state.selectedEventId = null;
+  state.eventPage = 0;
+  ui.eventSearch.value = "";
   ui.empty.hidden = true;
   ui.view.hidden = false;
   renderVerdict(report);
@@ -780,6 +839,13 @@ async function runAnalysis() {
     return;
   }
 
+  const requestConfiguration = configurationSnapshot();
+  const requestPayload = {
+    jsonl,
+    relation_tolerance_us: tolerance,
+    reference_clock: ui.reference.value.trim(),
+    priors,
+  };
   ui.analyze.disabled = true;
   ui.analyze.classList.add("is-running");
   ui.analyze.querySelector(".button-label").textContent = "分析中…";
@@ -788,16 +854,15 @@ async function runAnalysis() {
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonl,
-        relation_tolerance_us: tolerance,
-        reference_clock: ui.reference.value.trim(),
-        priors,
-      }),
+      body: JSON.stringify(requestPayload),
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "分析请求失败");
     renderReport(result.report);
+    state.reportConfiguration = requestConfiguration;
+    state.reportPayload = requestPayload;
+    ui.exportMarkdown.disabled = state.markdownBusy;
+    updateReportFreshness();
     const status = result.report.has_conflicts === true
       ? "分析完成：发现约束冲突。"
       : result.report.has_conflicts === false
@@ -820,7 +885,7 @@ function jsonBlob(value) {
   });
 }
 
-function downloadJson(blob, filename) {
+function downloadFile(blob, filename) {
   const url = URL.createObjectURL(blob);
   const anchor = element("a");
   anchor.href = url;
@@ -832,7 +897,32 @@ function downloadJson(blob, filename) {
 }
 
 function exportReport() {
-  if (state.report) downloadJson(jsonBlob(state.report), "chronolens-diagnostic.json");
+  if (state.report) downloadFile(jsonBlob(state.report), "chronolens-diagnostic.json");
+}
+
+async function exportMarkdown() {
+  if (!state.reportPayload || state.markdownBusy) return;
+  state.markdownBusy = true;
+  ui.exportMarkdown.disabled = true;
+  ui.exportMarkdown.textContent = "正在生成 Markdown…";
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...state.reportPayload, format: "markdown" }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Markdown 报告生成失败。");
+    if (typeof result.markdown !== "string") throw new Error("返回的 Markdown 报告无效。");
+    downloadFile(new Blob([result.markdown], { type: "text/markdown;charset=utf-8" }),
+      "chronolens-diagnostic.md");
+  } catch (error) {
+    showToast(error.message || "Markdown 报告下载失败。", "is-error");
+  } finally {
+    state.markdownBusy = false;
+    ui.exportMarkdown.disabled = false;
+    ui.exportMarkdown.textContent = "↓ 导出 Markdown";
+  }
 }
 
 function exportPriors() {
@@ -841,7 +931,7 @@ function exportPriors() {
     if (priors.length === 0) return;
     const blob = jsonBlob(priors);
     if (blob.size > 1024 * 1024) throw new Error("先验 JSON 超过 CLI 的 1 MiB 文件上限。");
-    downloadJson(blob, "chronolens-offset-priors.json");
+    downloadFile(blob, "chronolens-offset-priors.json");
   } catch (error) {
     showToast(error.message || "无法下载相对偏移先验。", "is-error");
   }
@@ -866,8 +956,16 @@ ui.importPriorsFile.addEventListener("change", () => {
 });
 ui.file.addEventListener("change", () => acceptFile(ui.file.files?.[0]));
 ui.input.addEventListener("input", updateLineCount);
+ui.tolerance.addEventListener("input", updateReportFreshness);
+ui.reference.addEventListener("input", updateReportFreshness);
+ui.priorList.addEventListener("input", updateReportFreshness);
 ui.analyze.addEventListener("click", runAnalysis);
 ui.export.addEventListener("click", exportReport);
+ui.exportMarkdown.addEventListener("click", exportMarkdown);
+ui.eventSearch.addEventListener("input", () => {
+  state.eventPage = 0;
+  if (state.report) renderEvents(state.report);
+});
 ui.input.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === "Enter") runAnalysis();
 });

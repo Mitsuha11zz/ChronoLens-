@@ -471,6 +471,36 @@ a:focus-visible, summary:focus-visible, .dropzone:focus-within {
   .applied-prior-label { justify-self: start; }
 }
 
+.event-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.event-search input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.stale-report {
+  padding: 12px 16px;
+  margin: 0 0 16px;
+  border-left: 3px solid #b97421;
+  background: #fff4df;
+  color: #704411;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
