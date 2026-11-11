@@ -204,18 +204,31 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if request.path == "/api/sample":
-            sample_id = parse_qs(request.query).get("id", [""])[0]
+            query = parse_qs(request.query)
+            sample_id = query.get("id", [""])[0]
             sample = SAMPLES.get(sample_id)
             if sample is None:
                 self.send_json({"error": "未知的内置样例。"}, 404)
                 return
             label, path = sample
+            prior_example = query.get("priors", [""])[0]
+            prior_files = {
+                "feasible": "offset-priors.json",
+                "conflict": "conflicting-offset-priors.json",
+            }
+            if prior_example and (sample_id != "four-events" or prior_example not in prior_files):
+                self.send_json({"error": "未知的先验样例。"}, 404)
+                return
             try:
                 text = path.read_text(encoding="utf-8")
-            except (OSError, UnicodeError):
+                result = {"id": sample_id, "label": label, "jsonl": text}
+                if prior_example:
+                    prior_path = ROOT / "fixtures" / prior_files[prior_example]
+                    result["priors"] = json.loads(prior_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
                 self.send_json({"error": "内置样例读取失败。"}, 500)
                 return
-            self.send_json({"id": sample_id, "label": label, "jsonl": text})
+            self.send_json(result)
             return
 
         self.send_json({"error": "未找到此页面。"}, 404)

@@ -12,6 +12,7 @@ from http.server import ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,6 +138,54 @@ class WorkflowIntegrationTests(unittest.TestCase):
             self.assertEqual(1, len(report["components"]))
             self.assertEqual("feasible", report["components"][0]["status"])
             self.assertEqual(2, report["coverage"]["paired_groups"])
+
+            priors_path = ROOT / "fixtures" / "offset-priors.json"
+            priors = json.loads(priors_path.read_text(encoding="utf-8"))
+            with tempfile.TemporaryDirectory(prefix="chronolens-markdown-test-") as workdir:
+                events_path = Path(workdir) / "events.jsonl"
+                events_path.write_text(sample["jsonl"], encoding="utf-8")
+                expected = subprocess.run(
+                    [
+                        str(self.engine), events_path.name, "--format", "markdown",
+                        "--priors-file", str(priors_path),
+                    ],
+                    cwd=workdir,
+                    capture_output=True, text=True, encoding="utf-8", check=False,
+                )
+            self.assertEqual(0, expected.returncode, expected.stderr)
+            markdown_request = Request(
+                f"{base_url}/api/analyze",
+                data=json.dumps({
+                    "jsonl": sample["jsonl"],
+                    "priors": priors,
+                    "format": "markdown",
+                }).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urlopen(markdown_request, timeout=10) as response:
+                markdown_result = json.loads(response.read().decode("utf-8"))
+            self.assertEqual(0, markdown_result["exit_code"])
+            self.assertEqual(expected.stdout, markdown_result["markdown"])
+            self.assertIn(priors[0]["label"], markdown_result["markdown"])
+            self.assertNotIn("report", markdown_result)
+
+            for invalid_format in ("html", "", None, 1, [], {}):
+                with self.subTest(invalid_format=invalid_format):
+                    invalid_request = Request(
+                        f"{base_url}/api/analyze",
+                        data=json.dumps({
+                            "jsonl": sample["jsonl"], "format": invalid_format,
+                        }).encode("utf-8"),
+                        headers={"Content-Type": "application/json"},
+                        method="POST",
+                    )
+                    with self.assertRaises(HTTPError) as raised:
+                        urlopen(invalid_request, timeout=10)
+                    with raised.exception as response:
+                        self.assertEqual(400, response.code)
+                        error = json.loads(response.read().decode("utf-8"))
+                    self.assertIn("格式", error["error"])
         finally:
             httpd.shutdown()
             httpd.server_close()

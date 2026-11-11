@@ -1,0 +1,9 @@
+[
+  {
+    "clock_id": "B",
+    "reference_clock": "A",
+    "label": "conflicting-calibration",
+    "lower_us": "200000",
+    "upper_us": "220000"
+  }
+]

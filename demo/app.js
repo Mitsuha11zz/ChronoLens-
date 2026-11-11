@@ -14,6 +14,7 @@ const ui = {
   priorCount: byId("prior-count"),
   addPrior: byId("add-prior-button"),
   priorExample: byId("prior-example-button"),
+  priorConflict: byId("prior-conflict-button"),
   exportPriors: byId("export-priors-button"),
   importPriors: byId("import-priors-button"),
   importPriorsFile: byId("import-priors-file"),
@@ -82,15 +83,17 @@ function updateLineCount() {
   updateReportFreshness();
 }
 
-async function loadSample(sampleId) {
+async function loadSample(sampleId, priorExample = "") {
   try {
-    const response = await fetch(`/api/sample?id=${encodeURIComponent(sampleId)}`);
+    const query = new URLSearchParams({ id: sampleId });
+    if (priorExample) query.set("priors", priorExample);
+    const response = await fetch(`/api/sample?${query}`);
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "样例读取失败");
     ui.input.value = result.jsonl;
     ui.sourceName.textContent = `内置样例 · ${result.label}`;
     updateLineCount();
-    return true;
+    return result;
   } catch (error) {
     showToast(error.message || "无法载入内置样例。", "is-error");
     return false;
@@ -294,19 +297,18 @@ async function importPriors(file) {
   }
 }
 
-async function loadPriorExample() {
-  ui.sample.value = "four-events";
-  if (!await loadSample("four-events")) return;
+async function loadPriorExample(conflict) {
+  const sample = await loadSample("four-events", conflict ? "conflict" : "feasible");
+  if (!sample) return;
+  ui.sample.value = sample.id;
+  ui.tolerance.value = "0";
+  ui.reference.value = "A";
   ui.priorList.replaceChildren();
-  addPriorRow({
-    clock_id: "B",
-    reference_clock: "A",
-    label: "calibration-window",
-    lower_us: "120000",
-    upper_us: "150000",
-  });
+  for (const prior of sample.priors) addPriorRow(prior);
   ui.priorEditor.open = true;
-  showToast("已载入四事件样例与相对偏移范围。");
+  showToast(conflict
+    ? "已载入冲突示例。运行分析可查看先验与消息约束形成的冲突证据。"
+    : "已载入四事件样例与相对偏移范围。");
 }
 
 function acceptFile(file) {
@@ -944,7 +946,8 @@ ui.addPrior.addEventListener("click", () => {
   ui.priorEditor.open = true;
   addPriorRow();
 });
-ui.priorExample.addEventListener("click", loadPriorExample);
+ui.priorExample.addEventListener("click", () => loadPriorExample(false));
+ui.priorConflict.addEventListener("click", () => loadPriorExample(true));
 ui.exportPriors.addEventListener("click", exportPriors);
 ui.importPriors.addEventListener("click", () => ui.importPriorsFile.click());
 ui.clearPriors.addEventListener("click", clearPriors);

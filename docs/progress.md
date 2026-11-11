@@ -292,3 +292,7 @@ JSONL 和 typed-event 两个根包入口新增可选 `priors` 参数，接受约
 本地工作台新增可增删的相对偏移先验编辑器，可填写目标时钟、参考时钟、唯一标签和单侧／双侧 Int64 微秒边界；提供与四事件样例配套的先验按钮。服务端校验先验数量、字段、标签、数值范围和边界顺序，在临时目录生成先验 JSON 后调用正式 CLI。分析结果增加已应用先验摘要，明确显示 `offset(clock) - offset(reference)` 的范围。所有请求文件在分析后由临时目录清理。
 
 验证：先用 `fixtures/four-events.jsonl` 与 `fixtures/offset-priors.json` 调用 CLI，报告状态为 `feasible`，B-A 边际区间为 120,000–150,000 微秒，先验证据出现在报告中。`python -m py_compile demo/server.py`、`node --check demo/app.js` 和 `git diff --check` 通过。未新增或运行测试套件，也未进行浏览器交互验收。当前改动未提交、未推送，完成后停止等待用户确认。
+
+## 2026-11-06：Markdown API 集成回归
+
+扩展现有 HTTP 集成回归，使用相对偏移先验验证 Markdown API 与正式 CLI 输出一致，并检查六种非法格式返回 HTTP 400。对照调用使用相同的相对输入文件名，确保来源位置一致。运行集成测试的三个测试方法全部通过，新增用例包含在现有工作台测试中。

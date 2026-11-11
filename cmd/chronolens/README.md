@@ -12,6 +12,7 @@ moon run cmd/chronolens -- fixtures/four-events.jsonl --format markdown
 moon run cmd/chronolens -- fixtures/four-events.jsonl --output report.json
 moon run cmd/chronolens -- fixtures/four-events.jsonl --reference-clock service-a --relation-tolerance-us 50
 moon run cmd/chronolens -- fixtures/four-events.jsonl --priors-file fixtures/offset-priors.json
+moon run cmd/chronolens -- fixtures/four-events.jsonl --priors-file fixtures/conflicting-offset-priors.json
 ```
 
 默认输出缩进 JSON 到标准输出。`--format` 可选 `json` 或 `markdown`；`--output` 将报告写入文件。已有输出文件默认不会被覆盖，明确传入 `--force` 后才会替换。
