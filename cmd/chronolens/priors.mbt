@@ -86,7 +86,7 @@ fn prior_bound(fields : Map[String, Json], name : String) -> (Int64?, Bool) {
   match fields.get(name) {
     None | Some(Json::Null) => (None, true)
     Some(Json::String(text)) => {
-      let value = @string.parse_int64(text, base=10) catch {
+      let value = @string.parse_int64(text, radix=10) catch {
         _ => return (None, false)
       }
       (Some(value), true)

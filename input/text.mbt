@@ -61,7 +61,7 @@ fn timestamp(text : String, cap : Int) -> Int64 raise DecodeIssue {
   if !decimal_digits(text, signed=true) {
     raise DecodeIssue(InvalidValue("ts_us"))
   }
-  @string.parse_int64(text, base=10) catch {
+  @string.parse_int64(text, radix=10) catch {
     _ => raise DecodeIssue(InvalidValue("ts_us"))
   }
 }

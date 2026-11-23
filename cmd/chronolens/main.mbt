@@ -164,7 +164,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
   }
   let relation_tolerance_us = @string.parse_int64(
     option_value_or(matches, "relation_tolerance_us", "0"),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--relation-tolerance-us must be a decimal Int64")
   }
@@ -179,7 +179,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_input_bytes",
       input_defaults.max_input_bytes.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-input-bytes must be a positive decimal integer")
   }
@@ -189,7 +189,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_line_bytes",
       input_defaults.max_line_bytes.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-line-bytes must be a positive decimal integer")
   }
@@ -199,7 +199,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_records",
       input_defaults.max_records.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-records must be a positive decimal integer")
   }
@@ -209,7 +209,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_clock_domains",
       input_defaults.max_clock_domains.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ =>
       return Invalid("--max-clock-domains must be a positive decimal integer")
@@ -220,7 +220,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_field_bytes",
       input_defaults.max_field_bytes.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-field-bytes must be a positive decimal integer")
   }
@@ -230,7 +230,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_issues",
       input_defaults.max_issues.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-issues must be a positive decimal integer")
   }
@@ -240,7 +240,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_json_depth",
       input_defaults.max_json_depth.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-json-depth must be a positive decimal integer")
   }
@@ -263,7 +263,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_clocks",
       solve_defaults.max_clocks.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-clocks must be a positive decimal integer")
   }
@@ -273,7 +273,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_constraints",
       solve_defaults.max_constraints.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-constraints must be a positive decimal integer")
   }
@@ -283,7 +283,7 @@ fn parse_cli_config(matches : @argparse.Matches) -> CliConfigResult {
       "max_edge_visits",
       solve_defaults.max_edge_visits.to_string(),
     ),
-    base=10,
+    radix=10,
   ) catch {
     _ => return Invalid("--max-edge-visits must be a positive decimal Int64")
   }
